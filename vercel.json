@@ -13,22 +13,3 @@
     }
   ]
 }
-```
-
----
-
-## 📄 **File 4: .gitignore**
-```
-# Dependencies
-node_modules/
-
-# Production
-build/
-dist/
-
-# Misc
-.DS_Store
-*.log
-
-# Vercel
-.vercel
