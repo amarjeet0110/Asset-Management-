@@ -1,0 +1,13 @@
+{
+  "name": "asset-management-system",
+  "version": "1.0.0",
+  "description": "A modern asset management system",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "dev": "serve ."
+  },
+  "keywords": ["asset", "management", "system"],
+  "author": "Your Name",
+  "license": "MIT"
+}
