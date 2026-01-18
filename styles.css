@@ -1,342 +1,249 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+// State management
+let assets = [];
+let editingId = null;
+
+// DOM elements
+const loadingScreen = document.getElementById('loading');
+const appContainer = document.getElementById('app');
+const assetForm = document.getElementById('assetForm');
+const formTitle = document.getElementById('formTitle');
+const submitBtnText = document.getElementById('submitBtnText');
+const cancelBtn = document.getElementById('cancelBtn');
+const assetsList = document.getElementById('assetsList');
+const searchInput = document.getElementById('searchInput');
+const filterStatus = document.getElementById('filterStatus');
+const filterType = document.getElementById('filterType');
+
+// Form inputs
+const inputs = {
+    name: document.getElementById('name'),
+    type: document.getElementById('type'),
+    category: document.getElementById('category'),
+    value: document.getElementById('value'),
+    purchaseDate: document.getElementById('purchaseDate'),
+    status: document.getElementById('status'),
+    location: document.getElementById('location'),
+    assignedTo: document.getElementById('assignedTo'),
+    description: document.getElementById('description')
+};
+
+// Initialize app
+document.addEventListener('DOMContentLoaded', () => {
+    loadAssets();
+    setupEventListeners();
+});
+
+// Load assets from localStorage
+function loadAssets() {
+    try {
+        const stored = localStorage.getItem('asset-management-data');
+        if (stored) {
+            assets = JSON.parse(stored);
+        }
+    } catch (error) {
+        console.log('Starting fresh');
+    } finally {
+        loadingScreen.style.display = 'none';
+        appContainer.style.display = 'block';
+        updateStats();
+        renderAssets();
+    }
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-    min-height: 100vh;
-    padding: 20px;
-    color: #e0e0e0;
+// Save assets to localStorage
+function saveAssets() {
+    try {
+        localStorage.setItem('asset-management-data', JSON.stringify(assets));
+        updateStats();
+        renderAssets();
+    } catch (error) {
+        console.error('Error saving:', error);
+        alert('Error saving data!');
+    }
 }
 
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
+// Setup event listeners
+function setupEventListeners() {
+    assetForm.addEventListener('submit', handleSubmit);
+    cancelBtn.addEventListener('click', resetForm);
+    searchInput.addEventListener('input', renderAssets);
+    filterStatus.addEventListener('change', renderAssets);
+    filterType.addEventListener('change', renderAssets);
 }
 
-header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0, 255, 255, 0.1);
-    margin-bottom: 30px;
-    text-align: center;
-    border: 1px solid rgba(0, 255, 255, 0.2);
-}
+// Handle form submission
+function handleSubmit(e) {
+    e.preventDefault();
 
-h1 {
-    color: #00d9ff;
-    font-size: 2.8em;
-    margin-bottom: 10px;
-    text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
-}
+    const formData = {
+        name: inputs.name.value.trim(),
+        type: inputs.type.value,
+        category: inputs.category.value.trim(),
+        value: parseFloat(inputs.value.value) || 0,
+        purchaseDate: inputs.purchaseDate.value,
+        status: inputs.status.value,
+        location: inputs.location.value.trim(),
+        assignedTo: inputs.assignedTo.value.trim(),
+        description: inputs.description.value.trim()
+    };
 
-.subtitle {
-    color: #a0a0a0;
-    font-size: 1.1em;
-}
-
-.main-content {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 30px;
-}
-
-.form-section, .assets-section {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 255, 255, 0.1);
-}
-
-h2 {
-    color: #00d9ff;
-    margin-bottom: 25px;
-    font-size: 1.8em;
-    text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #b0b0b0;
-    font-weight: 600;
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid rgba(0, 255, 255, 0.2);
-    border-radius: 10px;
-    font-size: 1em;
-    transition: all 0.3s;
-    background: rgba(255, 255, 255, 0.05);
-    color: #e0e0e0;
-}
-
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #00d9ff;
-    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
-    background: rgba(255, 255, 255, 0.08);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-select option {
-    background: #1a1a2e;
-    color: #e0e0e0;
-}
-
-.btn {
-    padding: 12px 30px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-right: 10px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%);
-    color: #000;
-    box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 217, 255, 0.5);
-    background: linear-gradient(135deg, #00ffff 0%, #00b8e6 100%);
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: #e0e0e0;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.stat-card {
-    background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%);
-    color: #000;
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(0, 217, 255, 0.3);
-    transition: all 0.3s;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 217, 255, 0.4);
-}
-
-.stat-value {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.stat-label {
-    font-size: 0.95em;
-    opacity: 0.9;
-    font-weight: 600;
-}
-
-.search-filter {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.search-filter input {
-    flex: 1;
-}
-
-.asset-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.asset-card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 20px;
-    border-radius: 15px;
-    border-left: 4px solid #00d9ff;
-    transition: all 0.3s;
-    border: 1px solid rgba(0, 255, 255, 0.1);
-}
-
-.asset-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.asset-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 15px;
-}
-
-.asset-name {
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #00d9ff;
-}
-
-.asset-status {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85em;
-    font-weight: 600;
-}
-
-.status-active {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-    border: 1px solid #10b981;
-}
-
-.status-maintenance {
-    background: rgba(245, 158, 11, 0.2);
-    color: #f59e0b;
-    border: 1px solid #f59e0b;
-}
-
-.status-retired {
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-    border: 1px solid #ef4444;
-}
-
-.asset-detail {
-    margin-bottom: 8px;
-    color: #b0b0b0;
-    font-size: 0.95em;
-}
-
-.asset-detail strong {
-    color: #e0e0e0;
-}
-
-.asset-actions {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-}
-
-.btn-small {
-    padding: 8px 15px;
-    font-size: 0.9em;
-}
-
-.btn-edit {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: #000;
-    font-weight: 600;
-}
-
-.btn-delete {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: #fff;
-    font-weight: 600;
-}
-
-.btn-edit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
-}
-
-.btn-delete:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    color: #666;
-    grid-column: 1 / -1;
-}
-
-.empty-state-icon {
-    font-size: 5em;
-    margin-bottom: 20px;
-    opacity: 0.5;
-}
-
-.empty-state h3 {
-    color: #888;
-    margin-bottom: 10px;
-}
-
-footer {
-    margin-top: 40px;
-    text-align: center;
-    padding: 30px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 20px;
-    border: 1px solid rgba(0, 255, 255, 0.1);
-}
-
-footer p {
-    color: #b0b0b0;
-    font-size: 1.1em;
-}
-
-footer a {
-    color: #00d9ff;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s;
-    text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
-}
-
-footer a:hover {
-    color: #00ffff;
-    text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-}
-
-@media (max-width: 968px) {
-    .main-content {
-        grid-template-columns: 1fr;
+    if (!formData.name || !formData.type) {
+        alert('Please fill Name and Type fields!');
+        return;
     }
 
-    .stats {
-        grid-template-columns: 1fr;
+    if (editingId) {
+        // Update existing asset
+        const index = assets.findIndex(a => a.id === editingId);
+        if (index !== -1) {
+            assets[index] = { ...formData, id: editingId };
+        }
+        editingId = null;
+    } else {
+        // Add new asset
+        const newAsset = {
+            ...formData,
+            id: Date.now()
+        };
+        assets.push(newAsset);
     }
 
-    .search-filter {
-        flex-direction: column;
+    saveAssets();
+    resetForm();
+}
+
+// Reset form
+function resetForm() {
+    assetForm.reset();
+    editingId = null;
+    formTitle.textContent = '➕ Add New Asset';
+    submitBtnText.textContent = 'Add Asset';
+    cancelBtn.style.display = 'none';
+}
+
+// Edit asset
+function editAsset(id) {
+    const asset = assets.find(a => a.id === id);
+    if (!asset) return;
+
+    inputs.name.value = asset.name || '';
+    inputs.type.value = asset.type || '';
+    inputs.category.value = asset.category || '';
+    inputs.value.value = asset.value || '';
+    inputs.purchaseDate.value = asset.purchaseDate || '';
+    inputs.status.value = asset.status || 'Active';
+    inputs.location.value = asset.location || '';
+    inputs.assignedTo.value = asset.assignedTo || '';
+    inputs.description.value = asset.description || '';
+
+    editingId = id;
+    formTitle.textContent = '✏️ Edit Asset';
+    submitBtnText.textContent = 'Update Asset';
+    cancelBtn.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Delete asset
+function deleteAsset(id) {
+    if (confirm('Delete this asset?')) {
+        assets = assets.filter(a => a.id !== id);
+        saveAssets();
+    }
+}
+
+// Update statistics
+function updateStats() {
+    const totalAssets = assets.length;
+    const activeAssets = assets.filter(a => a.status === 'Active').length;
+    const totalValue = assets.reduce((sum, a) => sum + (a.value || 0), 0);
+
+    document.getElementById('totalAssets').textContent = totalAssets;
+    document.getElementById('activeAssets').textContent = activeAssets;
+    document.getElementById('totalValue').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
+}
+
+// Render assets
+function renderAssets() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const statusFilter = filterStatus.value;
+    const typeFilter = filterType.value;
+
+    const filtered = assets.filter(asset => {
+        const matchSearch = asset.name?.toLowerCase().includes(searchTerm) ||
+                           asset.type?.toLowerCase().includes(searchTerm);
+        const matchStatus = !statusFilter || asset.status === statusFilter;
+        const matchType = !typeFilter || asset.type === typeFilter;
+        return matchSearch && matchStatus && matchType;
+    });
+
+    if (filtered.length === 0) {
+        assetsList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <p class="empty-title">No assets found</p>
+                <p class="empty-subtitle">Add your first asset to get started!</p>
+            </div>
+        `;
+        return;
     }
 
-    h1 {
-        font-size: 2em;
-    }
+    assetsList.innerHTML = filtered.map(asset => `
+        <div class="asset-card">
+            <div class="asset-header">
+                <div>
+                    <h3 class="asset-title">${asset.name}</h3>
+                    <span class="status-badge status-${asset.status.toLowerCase()}">
+                        ${asset.status}
+                    </span>
+                </div>
+                <div class="asset-actions">
+                    <button class="btn-action btn-edit" onclick="editAsset(${asset.id})">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="deleteAsset(${asset.id})">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="asset-details">
+                <div class="asset-detail">
+                    <span class="asset-detail-label">Type:</span> ${asset.type}
+                </div>
+                ${asset.category ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Category:</span> ${asset.category}
+                    </div>
+                ` : ''}
+                ${asset.value > 0 ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Value:</span> ₹${asset.value.toLocaleString('en-IN')}
+                    </div>
+                ` : ''}
+                ${asset.location ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Location:</span> ${asset.location}
+                    </div>
+                ` : ''}
+                ${asset.assignedTo ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Assigned:</span> ${asset.assignedTo}
+                    </div>
+                ` : ''}
+                ${asset.purchaseDate ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Purchase:</span> ${asset.purchaseDate}
+                    </div>
+                ` : ''}
+            </div>
+            
+            ${asset.description ? `
+                <p class="asset-description">${asset.description}</p>
+            ` : ''}
+        </div>
+    `).join('');
 }
