@@ -7,120 +7,197 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🏢 Asset Management System</h1>
-            <p class="subtitle">Track and manage your organization's assets efficiently</p>
-        </header>
+    <div id="loading" class="loading-screen">
+        <div class="loading-text">Loading...</div>
+    </div>
 
-        <div class="main-content">
-            <div class="form-section">
-                <h2 id="formTitle">Add New Asset</h2>
-                <form id="assetForm">
-                    <div class="form-group">
-                        <label for="assetName">Asset Name *</label>
-                        <input type="text" id="assetName" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="assetType">Asset Type *</label>
-                        <select id="assetType" required>
-                            <option value="">Select Type</option>
-                            <option value="Hardware">Hardware</option>
-                            <option value="Software">Software</option>
-                            <option value="Furniture">Furniture</option>
-                            <option value="Vehicle">Vehicle</option>
-                            <option value="Equipment">Equipment</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="assetCategory">Category</label>
-                        <input type="text" id="assetCategory" placeholder="e.g., IT, Office, Transportation">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="assetValue">Value ($)</label>
-                        <input type="number" id="assetValue" min="0" step="0.01" placeholder="0.00">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="purchaseDate">Purchase Date</label>
-                        <input type="date" id="purchaseDate">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="assetStatus">Status *</label>
-                        <select id="assetStatus" required>
-                            <option value="Active">Active</option>
-                            <option value="Maintenance">Maintenance</option>
-                            <option value="Retired">Retired</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="location">Location</label>
-                        <input type="text" id="location" placeholder="e.g., Building A, Floor 3">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="assignedTo">Assigned To</label>
-                        <input type="text" id="assignedTo" placeholder="Employee name or department">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" placeholder="Additional details about the asset"></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Add Asset</button>
-                    <button type="button" class="btn btn-secondary" id="cancelBtn" style="display: none;">Cancel</button>
-                </form>
-            </div>
-
-            <div class="assets-section">
-                <h2>Asset Inventory</h2>
-                
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalAssets">0</div>
-                        <div class="stat-label">Total Assets</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="activeAssets">0</div>
-                        <div class="stat-label">Active</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalValue">$0</div>
-                        <div class="stat-label">Total Value</div>
-                    </div>
-                </div>
-
-                <div class="search-filter">
-                    <input type="text" id="searchInput" placeholder="🔍 Search assets...">
-                    <select id="filterStatus">
-                        <option value="">All Status</option>
-                        <option value="Active">Active</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Retired">Retired</option>
-                    </select>
-                    <select id="filterType">
-                        <option value="">All Types</option>
-                        <option value="Hardware">Hardware</option>
-                        <option value="Software">Software</option>
-                        <option value="Furniture">Furniture</option>
-                        <option value="Vehicle">Vehicle</option>
-                        <option value="Equipment">Equipment</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div id="assetContainer" class="asset-grid"></div>
-            </div>
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Animated Background -->
+        <div class="animated-background">
+            <div class="bg-blob bg-blob-1"></div>
+            <div class="bg-blob bg-blob-2"></div>
+            <div class="bg-blob bg-blob-3"></div>
         </div>
 
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <h1 class="main-title">🏢 Asset Management System</h1>
+                <p class="subtitle">Track and manage your organization's assets efficiently</p>
+            </div>
 
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-card-blue">
+                    <div class="stat-content">
+                        <div>
+                            <p class="stat-label">Total Assets</p>
+                            <p class="stat-value" id="totalAssets">0</p>
+                        </div>
+                        <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-card-green">
+                    <div class="stat-content">
+                        <div>
+                            <p class="stat-label">Active Assets</p>
+                            <p class="stat-value" id="activeAssets">0</p>
+                        </div>
+                        <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-card-purple">
+                    <div class="stat-content">
+                        <div>
+                            <p class="stat-label">Total Value</p>
+                            <p class="stat-value" id="totalValue">₹0</p>
+                        </div>
+                        <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="form-card">
+                        <h2 class="form-title" id="formTitle">➕ Add New Asset</h2>
+                        
+                        <form id="assetForm" class="form-content">
+                            <div class="form-group">
+                                <label class="form-label">Asset Name *</label>
+                                <input type="text" id="name" class="form-input" placeholder="Enter asset name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Type *</label>
+                                <select id="type" class="form-input" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Hardware">Hardware</option>
+                                    <option value="Software">Software</option>
+                                    <option value="Furniture">Furniture</option>
+                                    <option value="Vehicle">Vehicle</option>
+                                    <option value="Equipment">Equipment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <input type="text" id="category" class="form-input" placeholder="IT, Office, etc.">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Value (₹)</label>
+                                <input type="number" id="value" class="form-input" placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Purchase Date</label>
+                                <input type="date" id="purchaseDate" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Status *</label>
+                                <select id="status" class="form-input" required>
+                                    <option value="Active">Active</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Retired">Retired</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <input type="text" id="location" class="form-input" placeholder="Building, Floor, Room">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Assigned To</label>
+                                <input type="text" id="assignedTo" class="form-input" placeholder="Employee or Department">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea id="description" class="form-input form-textarea" rows="3" placeholder="Additional details"></textarea>
+                            </div>
+
+                            <div class="form-buttons">
+                                <button type="submit" class="btn-primary">
+                                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    <span id="submitBtnText">Add Asset</span>
+                                </button>
+                                <button type="button" id="cancelBtn" class="btn-cancel" style="display: none;">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Assets List -->
+                <div class="list-section">
+                    <div class="list-card">
+                        <h2 class="list-title">📦 Asset Inventory</h2>
+                        
+                        <!-- Search and Filters -->
+                        <div class="filters-grid">
+                            <div class="search-wrapper">
+                                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input type="text" id="searchInput" class="filter-input search-input" placeholder="Search assets...">
+                            </div>
+                            
+                            <select id="filterStatus" class="filter-input">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Retired">Retired</option>
+                            </select>
+
+                            <select id="filterType" class="filter-input">
+                                <option value="">All Types</option>
+                                <option value="Hardware">Hardware</option>
+                                <option value="Software">Software</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Vehicle">Vehicle</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Assets Grid -->
+                        <div id="assetsList" class="assets-list">
+                            <div class="empty-state">
+                                <div class="empty-icon">📦</div>
+                                <p class="empty-title">No assets found</p>
+                                <p class="empty-subtitle">Add your first asset to get started!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-card">
+                    <p class="footer-text">
+                        Developed by 
+                        <a href="https://amarjeet-portfolio-mu.vercel.app/" target="_blank" rel="noopener noreferrer" class="footer-link">
+                            Amarjeet
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
