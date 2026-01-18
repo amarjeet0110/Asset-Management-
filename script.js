@@ -1,196 +1,124 @@
-// Configuration - Change this to your backend URL when deployed
-const API_URL = 'http://localhost:5000/api';
-const USE_BACKEND = false; // Set to true when backend is running
-
+// State management
 let assets = [];
 let editingId = null;
 
+// DOM elements
+const loadingScreen = document.getElementById('loading');
+const appContainer = document.getElementById('app');
+const assetForm = document.getElementById('assetForm');
+const formTitle = document.getElementById('formTitle');
+const submitBtnText = document.getElementById('submitBtnText');
+const cancelBtn = document.getElementById('cancelBtn');
+const assetsList = document.getElementById('assetsList');
+const searchInput = document.getElementById('searchInput');
+const filterStatus = document.getElementById('filterStatus');
+const filterType = document.getElementById('filterType');
+
+// Form inputs
+const inputs = {
+    name: document.getElementById('name'),
+    type: document.getElementById('type'),
+    category: document.getElementById('category'),
+    value: document.getElementById('value'),
+    purchaseDate: document.getElementById('purchaseDate'),
+    status: document.getElementById('status'),
+    location: document.getElementById('location'),
+    assignedTo: document.getElementById('assignedTo'),
+    description: document.getElementById('description')
+};
+
 // Initialize app
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     loadAssets();
     setupEventListeners();
 });
 
-// Setup event listeners
-function setupEventListeners() {
-    // Form submission
-    document.getElementById('assetForm').addEventListener('submit', handleFormSubmit);
-    
-    // Cancel button
-    document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
-    
-    // Search and filters
-    document.getElementById('searchInput').addEventListener('input', renderAssets);
-    document.getElementById('filterStatus').addEventListener('change', renderAssets);
-    document.getElementById('filterType').addEventListener('change', renderAssets);
+// Load assets from localStorage
+function loadAssets() {
+    try {
+        const stored = localStorage.getItem('asset-management-data');
+        if (stored) {
+            assets = JSON.parse(stored);
+        }
+    } catch (error) {
+        console.log('Starting fresh');
+    } finally {
+        loadingScreen.style.display = 'none';
+        appContainer.style.display = 'block';
+        updateStats();
+        renderAssets();
+    }
 }
 
-// Load assets from backend or localStorage
-async function loadAssets() {
+// Save assets to localStorage
+function saveAssets() {
     try {
-        if (USE_BACKEND) {
-            const response = await fetch(`${API_URL}/assets`);
-            if (response.ok) {
-                assets = await response.json();
-            } else {
-                console.error('Failed to load assets from backend');
-                loadFromLocalStorage();
-            }
-        } else {
-            loadFromLocalStorage();
-        }
+        localStorage.setItem('asset-management-data', JSON.stringify(assets));
+        updateStats();
         renderAssets();
     } catch (error) {
-        console.error('Error loading assets:', error);
-        loadFromLocalStorage();
+        console.error('Error saving:', error);
+        alert('Error saving data!');
     }
 }
 
-// Load from localStorage
-function loadFromLocalStorage() {
-    const saved = localStorage.getItem('assets');
-    if (saved) {
-        try {
-            assets = JSON.parse(saved);
-        } catch (e) {
-            console.error('Error parsing saved assets:', e);
-            assets = [];
-        }
-    }
-}
-
-// Save assets to backend or localStorage
-async function saveAssets() {
-    if (USE_BACKEND) {
-        // Backend will handle individual save operations
-        return;
-    } else {
-        try {
-            localStorage.setItem('assets', JSON.stringify(assets));
-        } catch (e) {
-            console.error('Error saving assets:', e);
-            alert('Failed to save assets. Please try again.');
-        }
-    }
+// Setup event listeners
+function setupEventListeners() {
+    assetForm.addEventListener('submit', handleSubmit);
+    cancelBtn.addEventListener('click', resetForm);
+    searchInput.addEventListener('input', renderAssets);
+    filterStatus.addEventListener('change', renderAssets);
+    filterType.addEventListener('change', renderAssets);
 }
 
 // Handle form submission
-async function handleFormSubmit(e) {
+function handleSubmit(e) {
     e.preventDefault();
 
-    const assetData = {
-        name: document.getElementById('assetName').value.trim(),
-        type: document.getElementById('assetType').value,
-        category: document.getElementById('assetCategory').value.trim(),
-        value: parseFloat(document.getElementById('assetValue').value) || 0,
-        purchaseDate: document.getElementById('purchaseDate').value,
-        status: document.getElementById('assetStatus').value,
-        location: document.getElementById('location').value.trim(),
-        assignedTo: document.getElementById('assignedTo').value.trim(),
-        description: document.getElementById('description').value.trim()
+    const formData = {
+        name: inputs.name.value.trim(),
+        type: inputs.type.value,
+        category: inputs.category.value.trim(),
+        value: parseFloat(inputs.value.value) || 0,
+        purchaseDate: inputs.purchaseDate.value,
+        status: inputs.status.value,
+        location: inputs.location.value.trim(),
+        assignedTo: inputs.assignedTo.value.trim(),
+        description: inputs.description.value.trim()
     };
 
-    try {
-        if (editingId) {
-            // Update existing asset
-            await updateAsset(editingId, assetData);
-        } else {
-            // Create new asset
-            await createAsset(assetData);
-        }
-
-        // Reset form
-        document.getElementById('assetForm').reset();
-        editingId = null;
-        document.getElementById('formTitle').textContent = 'Add New Asset';
-        document.getElementById('cancelBtn').style.display = 'none';
-
-        // Show success message
-        showNotification('Asset saved successfully!', 'success');
-    } catch (error) {
-        console.error('Error saving asset:', error);
-        showNotification('Failed to save asset. Please try again.', 'error');
-    }
-}
-
-// Create new asset
-async function createAsset(assetData) {
-    if (USE_BACKEND) {
-        const response = await fetch(`${API_URL}/assets`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(assetData)
-        });
-        
-        if (!response.ok) throw new Error('Failed to create asset');
-        
-        const newAsset = await response.json();
-        assets.push(newAsset);
-    } else {
-        const newAsset = {
-            id: Date.now(),
-            ...assetData
-        };
-        assets.push(newAsset);
-        await saveAssets();
-    }
-    
-    renderAssets();
-}
-
-// Update existing asset
-async function updateAsset(id, assetData) {
-    if (USE_BACKEND) {
-        const response = await fetch(`${API_URL}/assets/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(assetData)
-        });
-        
-        if (!response.ok) throw new Error('Failed to update asset');
-        
-        const updatedAsset = await response.json();
-        const index = assets.findIndex(a => a.id === id);
-        if (index !== -1) {
-            assets[index] = updatedAsset;
-        }
-    } else {
-        const index = assets.findIndex(a => a.id === id);
-        if (index !== -1) {
-            assets[index] = {
-                id: id,
-                ...assetData
-            };
-            await saveAssets();
-        }
-    }
-    
-    renderAssets();
-}
-
-// Delete asset
-async function deleteAsset(id) {
-    if (!confirm('Are you sure you want to delete this asset?')) {
+    if (!formData.name || !formData.type) {
+        alert('Please fill Name and Type fields!');
         return;
     }
 
-    try {
-        if (USE_BACKEND) {
-            const response = await fetch(`${API_URL}/assets/${id}`, {
-                method: 'DELETE'
-            });
-            
-            if (!response.ok) throw new Error('Failed to delete asset');
+    if (editingId) {
+        // Update existing asset
+        const index = assets.findIndex(a => a.id === editingId);
+        if (index !== -1) {
+            assets[index] = { ...formData, id: editingId };
         }
-        
-        assets = assets.filter(a => a.id !== id);
-        await saveAssets();
-        renderAssets();
-        showNotification('Asset deleted successfully!', 'success');
-    } catch (error) {
-        console.error('Error deleting asset:', error);
-        showNotification('Failed to delete asset. Please try again.', 'error');
+        editingId = null;
+    } else {
+        // Add new asset
+        const newAsset = {
+            ...formData,
+            id: Date.now()
+        };
+        assets.push(newAsset);
     }
+
+    saveAssets();
+    resetForm();
+}
+
+// Reset form
+function resetForm() {
+    assetForm.reset();
+    editingId = null;
+    formTitle.textContent = '➕ Add New Asset';
+    submitBtnText.textContent = 'Add Asset';
+    cancelBtn.style.display = 'none';
 }
 
 // Edit asset
@@ -198,112 +126,124 @@ function editAsset(id) {
     const asset = assets.find(a => a.id === id);
     if (!asset) return;
 
-    editingId = id;
-    document.getElementById('formTitle').textContent = 'Edit Asset';
-    document.getElementById('cancelBtn').style.display = 'inline-block';
-    
-    // Populate form
-    document.getElementById('assetName').value = asset.name || '';
-    document.getElementById('assetType').value = asset.type || '';
-    document.getElementById('assetCategory').value = asset.category || '';
-    document.getElementById('assetValue').value = asset.value || 0;
-    document.getElementById('purchaseDate').value = asset.purchaseDate || '';
-    document.getElementById('assetStatus').value = asset.status || 'Active';
-    document.getElementById('location').value = asset.location || '';
-    document.getElementById('assignedTo').value = asset.assignedTo || '';
-    document.getElementById('description').value = asset.description || '';
+    inputs.name.value = asset.name || '';
+    inputs.type.value = asset.type || '';
+    inputs.category.value = asset.category || '';
+    inputs.value.value = asset.value || '';
+    inputs.purchaseDate.value = asset.purchaseDate || '';
+    inputs.status.value = asset.status || 'Active';
+    inputs.location.value = asset.location || '';
+    inputs.assignedTo.value = asset.assignedTo || '';
+    inputs.description.value = asset.description || '';
 
-    // Scroll to form
+    editingId = id;
+    formTitle.textContent = '✏️ Edit Asset';
+    submitBtnText.textContent = 'Update Asset';
+    cancelBtn.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Cancel edit
-function cancelEdit() {
-    editingId = null;
-    document.getElementById('formTitle').textContent = 'Add New Asset';
-    document.getElementById('assetForm').reset();
-    document.getElementById('cancelBtn').style.display = 'none';
-}
-
-// Render assets
-function renderAssets() {
-    const container = document.getElementById('assetContainer');
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const statusFilter = document.getElementById('filterStatus').value;
-    const typeFilter = document.getElementById('filterType').value;
-
-    // Filter assets
-    let filteredAssets = assets.filter(asset => {
-        const matchesSearch = 
-            (asset.name && asset.name.toLowerCase().includes(searchTerm)) ||
-            (asset.type && asset.type.toLowerCase().includes(searchTerm)) ||
-            (asset.category && asset.category.toLowerCase().includes(searchTerm)) ||
-            (asset.location && asset.location.toLowerCase().includes(searchTerm)) ||
-            (asset.assignedTo && asset.assignedTo.toLowerCase().includes(searchTerm));
-        
-        const matchesStatus = !statusFilter || asset.status === statusFilter;
-        const matchesType = !typeFilter || asset.type === typeFilter;
-        
-        return matchesSearch && matchesStatus && matchesType;
-    });
-
-    // Render
-    if (filteredAssets.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📦</div>
-                <h3>No assets found</h3>
-                <p>${assets.length === 0 ? 'Add your first asset to get started!' : 'Try adjusting your search or filters'}</p>
-            </div>
-        `;
-    } else {
-        container.innerHTML = filteredAssets.map(asset => `
-            <div class="asset-card">
-                <div class="asset-header">
-                    <div class="asset-name">${escapeHtml(asset.name)}</div>
-                    <span class="asset-status status-${(asset.status || 'active').toLowerCase()}">${escapeHtml(asset.status)}</span>
-                </div>
-                <div class="asset-detail"><strong>Type:</strong> ${escapeHtml(asset.type)}</div>
-                ${asset.category ? `<div class="asset-detail"><strong>Category:</strong> ${escapeHtml(asset.category)}</div>` : ''}
-                ${asset.value > 0 ? `<div class="asset-detail"><strong>Value:</strong> $${asset.value.toFixed(2)}</div>` : ''}
-                ${asset.location ? `<div class="asset-detail"><strong>Location:</strong> ${escapeHtml(asset.location)}</div>` : ''}
-                ${asset.assignedTo ? `<div class="asset-detail"><strong>Assigned To:</strong> ${escapeHtml(asset.assignedTo)}</div>` : ''}
-                ${asset.purchaseDate ? `<div class="asset-detail"><strong>Purchase Date:</strong> ${escapeHtml(asset.purchaseDate)}</div>` : ''}
-                ${asset.description ? `<div class="asset-detail"><strong>Notes:</strong> ${escapeHtml(asset.description)}</div>` : ''}
-                <div class="asset-actions">
-                    <button class="btn btn-small btn-edit" onclick="editAsset(${asset.id})">Edit</button>
-                    <button class="btn btn-small btn-delete" onclick="deleteAsset(${asset.id})">Delete</button>
-                </div>
-            </div>
-        `).join('');
+// Delete asset
+function deleteAsset(id) {
+    if (confirm('Delete this asset?')) {
+        assets = assets.filter(a => a.id !== id);
+        saveAssets();
     }
-
-    updateStats();
 }
 
 // Update statistics
 function updateStats() {
-    document.getElementById('totalAssets').textContent = assets.length;
-    document.getElementById('activeAssets').textContent = assets.filter(a => a.status === 'Active').length;
-    const totalValue = assets.reduce((sum, asset) => sum + (asset.value || 0), 0);
-    document.getElementById('totalValue').textContent = `$${totalValue.toFixed(2)}`;
+    const totalAssets = assets.length;
+    const activeAssets = assets.filter(a => a.status === 'Active').length;
+    const totalValue = assets.reduce((sum, a) => sum + (a.value || 0), 0);
+
+    document.getElementById('totalAssets').textContent = totalAssets;
+    document.getElementById('activeAssets').textContent = activeAssets;
+    document.getElementById('totalValue').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
 }
 
-// Show notification
-function showNotification(message, type = 'success') {
-    // Simple alert for now - can be replaced with a better notification system
-    console.log(`${type.toUpperCase()}: ${message}`);
-}
+// Render assets
+function renderAssets() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const statusFilter = filterStatus.value;
+    const typeFilter = filterType.value;
 
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-    if (!text) return '';
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return text.toString().replace(/[&<>"']/g, m => map[m]);
+    const filtered = assets.filter(asset => {
+        const matchSearch = asset.name?.toLowerCase().includes(searchTerm) ||
+                           asset.type?.toLowerCase().includes(searchTerm);
+        const matchStatus = !statusFilter || asset.status === statusFilter;
+        const matchType = !typeFilter || asset.type === typeFilter;
+        return matchSearch && matchStatus && matchType;
+    });
+
+    if (filtered.length === 0) {
+        assetsList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <p class="empty-title">No assets found</p>
+                <p class="empty-subtitle">Add your first asset to get started!</p>
+            </div>
+        `;
+        return;
+    }
+
+    assetsList.innerHTML = filtered.map(asset => `
+        <div class="asset-card">
+            <div class="asset-header">
+                <div>
+                    <h3 class="asset-title">${asset.name}</h3>
+                    <span class="status-badge status-${asset.status.toLowerCase()}">
+                        ${asset.status}
+                    </span>
+                </div>
+                <div class="asset-actions">
+                    <button class="btn-action btn-edit" onclick="editAsset(${asset.id})">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="deleteAsset(${asset.id})">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="asset-details">
+                <div class="asset-detail">
+                    <span class="asset-detail-label">Type:</span> ${asset.type}
+                </div>
+                ${asset.category ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Category:</span> ${asset.category}
+                    </div>
+                ` : ''}
+                ${asset.value > 0 ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Value:</span> ₹${asset.value.toLocaleString('en-IN')}
+                    </div>
+                ` : ''}
+                ${asset.location ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Location:</span> ${asset.location}
+                    </div>
+                ` : ''}
+                ${asset.assignedTo ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Assigned:</span> ${asset.assignedTo}
+                    </div>
+                ` : ''}
+                ${asset.purchaseDate ? `
+                    <div class="asset-detail">
+                        <span class="asset-detail-label">Purchase:</span> ${asset.purchaseDate}
+                    </div>
+                ` : ''}
+            </div>
+            
+            ${asset.description ? `
+                <p class="asset-description">${asset.description}</p>
+            ` : ''}
+        </div>
+    `).join('');
 }
