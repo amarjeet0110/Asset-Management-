@@ -923,34 +923,30 @@
         }
 
         function handleLogout() {
-            if (confirm('क्या आप logout करना चाहते हैं?')) {
-                sessionStorage.removeItem('currentUser');
-                currentUser = null;
-                
-                // Clear all form fields
-                document.getElementById('loginUser').value = '';
-                document.getElementById('loginPass').value = '';
-                document.getElementById('assetName').value = '';
-                document.getElementById('assetType').value = '';
-                document.getElementById('assetValue').value = '';
-                document.getElementById('assetStatus').value = 'Active';
-                document.getElementById('assetLocation').value = '';
-                document.getElementById('assetDesc').value = '';
-                document.getElementById('searchBox').value = '';
-                
-                // Reset edit mode
-                editId = null;
-                document.getElementById('formTitle').textContent = 'Add Asset';
-                document.getElementById('saveBtn').textContent = 'Add Asset';
-                document.getElementById('cancelBtn').style.display = 'none';
-                
-                // Hide dashboard and show login
-                document.getElementById('dashboard').classList.remove('active');
-                document.getElementById('loginPage').classList.remove('hidden');
-                
-                // Switch to login tab
-                switchTab('login');
-            }
+            // Clear session
+            sessionStorage.clear();
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            
+            // Hide dashboard
+            document.getElementById('dashboard').style.display = 'none';
+            
+            // Show login page
+            const loginPage = document.getElementById('loginPage');
+            loginPage.style.display = 'flex';
+            loginPage.classList.remove('hidden');
+            
+            // Clear login fields
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            
+            // Switch to login tab
+            switchTab('login');
+            
+            // Reload page to ensure clean state
+            setTimeout(() => {
+                location.reload();
+            }, 100);
         }
 
         function toggleTheme() {
