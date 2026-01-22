@@ -3,1597 +3,1012 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asset Management System</title>
+    <title>Advanced Asset Management System</title>
+    <!-- Chart.js for Graphical Representation -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --secondary: #64748b;
+            --bg-dark: #0f172a;
+            --card-dark: rgba(255, 255, 255, 0.05);
+            --text-light: #f1f5f9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+            color: white;
+            overflow-x: hidden;
         }
 
-        body.light-mode {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
-        }
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
-        .bg-animation {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .blob {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        .blob1 {
-            background: rgba(14, 165, 233, 0.3);
-            top: -200px;
-            left: -200px;
-        }
-
-        .blob2 {
-            background: rgba(59, 130, 246, 0.3);
-            top: 40%;
-            right: -200px;
-            animation-delay: 1s;
-        }
-
-        .blob3 {
-            background: rgba(6, 182, 212, 0.3);
-            bottom: 0;
-            left: 40%;
-            animation-delay: 2s;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-        }
-
+        /* --- Login Styles --- */
         .login-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            background: #0f172a;
+            background-image: radial-gradient(circle at 50% 50%, #1e3a8a 0%, #0f172a 70%);
         }
-
-        .login-page.hidden {
-            display: none;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 500px;
-        }
-
+        .login-page.hidden { display: none; }
+        
         .login-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
-            border-radius: 1.5rem;
-            padding: 3rem;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem; border-radius: 1.5rem;
+            width: 100%; max-width: 450px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
 
-        body.light-mode .login-card {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: #94a3b8; }
+        .form-input {
+            width: 100%; padding: 0.75rem;
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem; color: white; outline: none; transition: 0.3s;
         }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-header h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
-        body.light-mode .login-header h1 {
-            color: #0f172a;
-        }
-
-        .login-header p {
-            font-size: 1rem;
-            color: #bae6fd;
-        }
-
-        body.light-mode .login-header p {
-            color: #64748b;
-        }
-
-        .role-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .role-btn {
-            padding: 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            user-select: none;
-        }
-
-        body.light-mode .role-btn {
-            background: rgba(0, 0, 0, 0.05);
-            color: rgba(0, 0, 0, 0.6);
-            border-color: #e2e8f0;
-        }
-
-        .role-btn.active {
-            background: linear-gradient(to right, #0ea5e9, #2563eb);
-            border-color: #0ea5e9;
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4);
-        }
-
-        .role-btn:hover:not(.active) {
-            border-color: #0ea5e9;
-            background: rgba(14, 165, 233, 0.1);
-            transform: scale(1.02);
-        }
-
-        .login-links {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .login-link {
-            color: #7dd3fc;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        body.light-mode .login-link {
-            color: #0284c7;
-        }
-
-        .login-link:hover {
-            color: #0ea5e9;
-            text-decoration: underline;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-header h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
-        body.light-mode .login-header h1 {
-            color: #0f172a;
-        }
-
-        .login-header p {
-            font-size: 1rem;
-            color: #bae6fd;
-            margin-bottom: 0;
-        }
-
-        body.light-mode .login-header p {
-            color: #64748b;
-        }
-
-        .register-section {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 1.5rem;
-            padding: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        body.light-mode .register-section {
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: white;
-        }
-
-        body.light-mode .section-title {
-            color: #0f172a;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        body.light-mode .tab {
-            background: rgba(0, 0, 0, 0.05);
-            color: rgba(0, 0, 0, 0.5);
-        }
-
-        .tab.active {
-            background: linear-gradient(to right, #0ea5e9, #2563eb);
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 1rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
-        body.light-mode .form-group label {
-            color: #0f172a;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.875rem;
-            font-size: 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s;
-        }
-
-        body.light-mode .form-group input,
-        body.light-mode .form-group select,
-        body.light-mode .form-group textarea {
-            background: white;
-            color: #0f172a;
-            border-color: #e2e8f0;
-        }
-
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        body.light-mode .form-group input::placeholder,
-        body.light-mode .form-group textarea::placeholder {
-            color: rgba(0, 0, 0, 0.4);
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #0ea5e9;
-        }
+        .form-input:focus { border-color: var(--primary); }
 
         .btn {
-            width: 100%;
-            padding: 1rem;
-            font-size: 1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: linear-gradient(to right, #0ea5e9, #2563eb);
-            color: white;
+            width: 100%; padding: 0.875rem; border: none; border-radius: 0.5rem;
+            background: linear-gradient(to right, var(--primary), #2563eb);
+            color: white; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3); }
+        .btn-danger { background: linear-gradient(to right, #ef4444, #b91c1c); }
+        .btn-success { background: linear-gradient(to right, #10b981, #059669); }
+        
+        .toggle-links { display: flex; justify-content: space-between; margin-top: 1rem; font-size: 0.85rem; }
+        .toggle-links a { color: #7dd3fc; cursor: pointer; text-decoration: none; }
+
+        /* --- Dashboard Layout --- */
+        .dashboard { display: none; min-height: 100vh; }
+        .dashboard.active { display: flex; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px; background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column; padding: 1.5rem;
+            position: fixed; top: 0; bottom: 0; left: 0; z-index: 50;
+        }
+        
+        .brand { font-size: 1.5rem; font-weight: bold; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .nav-item {
+            padding: 0.75rem 1rem; margin-bottom: 0.5rem;
+            border-radius: 0.5rem; cursor: pointer; color: #94a3b8;
+            transition: 0.3s; display: flex; align-items: center; gap: 0.75rem;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { border-left: 3px solid var(--primary); }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; flex: 1; padding: 2rem; width: calc(100% - 260px); }
+
+        .top-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4);
+        /* Cards & Grid */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
         }
-
-        .demo-text {
-            margin-top: 1rem;
-            text-align: center;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.875rem;
-        }
-
-        body.light-mode .demo-text {
-            color: rgba(0,0,0,0.5);
-        }
-
-        .dashboard {
-            position: relative;
-            z-index: 10;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: none;
-        }
-
-        .dashboard.active {
-            display: block;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        body.light-mode .top-bar {
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        body.light-mode .user-name {
-            color: #0f172a;
-        }
-
-        .badge {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .badge-admin {
-            background: rgba(139, 92, 246, 0.2);
-            color: #a78bfa;
-        }
-
-        .badge-employee {
-            background: rgba(14, 165, 233, 0.2);
-            color: #7dd3fc;
-        }
-
-        .actions {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-icon {
-            padding: 0.75rem 1.25rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.875rem;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s;
-        }
-
-        body.light-mode .btn-icon {
-            background: rgba(0, 0, 0, 0.05);
-            color: #0f172a;
-        }
-
-        .btn-icon:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .header h1 {
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            color: white;
-        }
-
-        body.light-mode .header h1 {
-            color: #0f172a;
-        }
-
-        .header p {
-            font-size: 1.25rem;
-            color: #bae6fd;
-        }
-
-        body.light-mode .header p {
-            color: #64748b;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
         .stat-card {
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
+            background: var(--card-dark); padding: 1.5rem; border-radius: 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .stat-val { font-size: 2rem; font-weight: bold; margin-top: 0.5rem; }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.4);
+        /* Tables & Lists */
+        .table-container {
+            background: var(--card-dark); border-radius: 1rem;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
         }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { background: rgba(0,0,0,0.2); font-weight: 600; color: #94a3b8; }
+        tr:hover { background: rgba(255,255,255,0.02); }
 
-        .stat-card.emerald {
-            background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
-        }
+        /* Badges */
+        .badge { padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
+        .badge-avail { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        .badge-busy { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .badge-bad { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .badge-warn { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
 
-        .stat-card.violet {
-            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-        }
-
-        .stat-label {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-            font-size: 3rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 1024px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        body.light-mode .card {
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .card h2 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            color: white;
-        }
-
-        body.light-mode .card h2 {
-            color: #0f172a;
-        }
-
-        .assets-list {
-            max-height: 700px;
-            overflow-y: auto;
-        }
-
-        .asset-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #0ea5e9;
-            transition: all 0.3s;
-        }
-
-        body.light-mode .asset-item {
-            background: rgba(255, 255, 255, 0.6);
-        }
-
-        .asset-item:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .asset-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 1rem;
-        }
-
-        .asset-name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
-
-        body.light-mode .asset-name {
-            color: #0f172a;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 0.4rem 1rem;
-            border-radius: 999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background: rgba(16, 185, 129, 0.2);
-            color: #6ee7b7;
-        }
-
-        body.light-mode .status-active {
-            color: #059669;
-        }
-
-        .status-maintenance {
-            background: rgba(245, 158, 11, 0.2);
-            color: #fcd34d;
-        }
-
-        body.light-mode .status-maintenance {
-            color: #d97706;
-        }
-
-        .status-retired {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-        }
-
-        body.light-mode .status-retired {
-            color: #dc2626;
-        }
-
-        .asset-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-edit {
-            background: rgba(245, 158, 11, 0.2);
-            color: #fcd34d;
-        }
-
-        body.light-mode .btn-edit {
-            color: #d97706;
-        }
-
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-        }
-
-        body.light-mode .btn-delete {
-            color: #dc2626;
-        }
-
-        .asset-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        body.light-mode .asset-details {
-            color: rgba(0, 0, 0, 0.7);
-        }
-
-        .empty {
-            text-align: center;
-            padding: 4rem 0;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        body.light-mode .empty {
-            color: rgba(0, 0, 0, 0.5);
-        }
-
+        /* Modals */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            display: none; position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center;
         }
-
-        .modal.show {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-
+        .modal.show { display: flex; }
         .modal-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #1e293b; padding: 2rem; border-radius: 1rem;
+            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        body.light-mode .modal-content {
-            background: rgba(255, 255, 255, 0.95);
+        /* Chart Container */
+        .chart-wrapper {
+            background: var(--card-dark); padding: 1.5rem; border-radius: 1rem;
+            height: 400px; display: flex; justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
+        /* Content Sections */
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .modal-header h2 {
-            font-size: 1.75rem;
-            color: white;
+        .action-btn {
+            padding: 0.4rem 0.8rem; border-radius: 0.4rem; border: none;
+            cursor: pointer; font-size: 0.8rem; margin-right: 0.3rem; color: white;
         }
-
-        body.light-mode .modal-header h2 {
-            color: #0f172a;
-        }
-
-        .btn-close {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        body.light-mode .btn-close {
-            color: #dc2626;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 { font-size: 2rem; }
-            .asset-details { grid-template-columns: 1fr; }
-            .actions { justify-content: center; }
-            .role-selector { grid-template-columns: 1fr; }
-            .login-card { padding: 2rem; }
-        }
+        .btn-blue { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+        .btn-blue:hover { background: rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="blob blob1"></div>
-        <div class="blob blob2"></div>
-        <div class="blob blob3"></div>
-    </div>
 
-    <!-- Login Page -->
+    <!-- LOGIN PAGE -->
     <div class="login-page" id="loginPage">
-        <div class="login-container">
-            <!-- Main Login Card -->
-            <div class="login-card" id="loginCard">
-                <div class="login-header">
-                    <h1>🏢 Asset Manager</h1>
-                    <p>Secure Login Portal</p>
-                </div>
-
-                <!-- Role Selection -->
-                <div class="role-selector">
-                    <button type="button" class="role-btn active" id="adminRoleBtn">
-                        <span>👨‍💼</span> <span>Admin</span>
-                    </button>
-                    <button type="button" class="role-btn" id="employeeRoleBtn">
-                        <span>👤</span> <span>Employee</span>
-                    </button>
-                </div>
-
-                <!-- Login Form -->
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUser" placeholder="Enter username">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPass" placeholder="Enter password">
-                </div>
-                
-                <button class="btn" id="loginBtn">Login</button>
-                
-                <div class="login-links">
-                    <a class="login-link" id="registerLink">Create Account</a>
-                    <a class="login-link" id="forgotLink">Forgot Password?</a>
-                </div>
-                
-                <p class="demo-text" id="demoText">
-                    Demo: admin/admin123
-                </p>
+        <div class="login-card">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2rem;">🏢 AssetPro</h1>
+                <p style="color: #94a3b8;">Enterprise Asset Management</p>
             </div>
-        </div>
-    </div>
-
-    <!-- Registration Modal -->
-    <div class="modal-overlay" id="registerModal">
-        <div class="login-container">
-            <div class="register-section">
-                <h2 class="section-title">📝 Create Account</h2>
+            
+            <div id="loginForm">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="regUser" placeholder="Choose username">
+                    <input type="text" class="form-input" id="loginUser" placeholder="Enter username">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="regPass" placeholder="Choose password">
+                    <input type="password" class="form-input" id="loginPass" placeholder="Enter password">
                 </div>
+                <button class="btn" onclick="handleLogin()">Login</button>
+                <div class="toggle-links">
+                    <a onclick="toggleForms('register')">Create Account</a>
+                    <span style="color: #64748b; font-size: 0.8rem;">Demo: admin/admin123</span>
+                </div>
+            </div>
+
+            <div id="registerForm" style="display: none;">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="regName" placeholder="Enter full name">
+                    <input type="text" class="form-input" id="regName">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-input" id="regUser">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-input" id="regPass">
                 </div>
                 <div class="form-group">
                     <label>Role</label>
-                    <select id="regRole">
+                    <select class="form-input" id="regRole">
                         <option value="employee">Employee</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
-                <button class="btn" id="registerBtn">Register Now</button>
-                <div class="back-link">
-                    <a class="login-link" id="backFromRegister">← Back to Login</a>
+                <button class="btn btn-success" onclick="handleRegister()">Register</button>
+                <div class="toggle-links">
+                    <a onclick="toggleForms('login')">← Back to Login</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Forgot Password Modal -->
-    <div class="modal-overlay" id="forgotModal">
-        <div class="login-container">
-            <div class="register-section">
-                <h2 class="section-title">🔑 Reset Password</h2>
-                
-                <!-- Step 1: Request OTP -->
-                <div id="otpRequestSection">
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" id="forgotUser" placeholder="Enter your username">
-                    </div>
-                    <button class="btn" id="sendOtpBtn">Send OTP</button>
-                </div>
-                
-                <!-- Step 2: Verify OTP and Reset Password -->
-                <div id="otpVerifySection" style="display: none;">
-                    <div class="form-group">
-                        <label>Enter OTP</label>
-                        <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6">
-                        <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #10b981;" id="otpSentMsg"></p>
-                    </div>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" id="forgotNewPass" placeholder="Enter new password">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="forgotConfirmPass" placeholder="Confirm new password">
-                    </div>
-                    <button class="btn" id="resetPasswordBtn">Reset Password</button>
-                    <button class="btn" id="resendOtpBtn" style="margin-top: 0.5rem; background: #64748b;">Resend OTP</button>
-                </div>
-                
-                <div class="back-link">
-                    <a class="login-link" id="backFromForgot">← Back to Login</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard -->
+    <!-- DASHBOARD -->
     <div class="dashboard" id="dashboard">
-        <div class="top-bar">
-            <div class="user-info">
-                <span class="user-name" id="userName">Welcome</span>
-                <span class="badge" id="userBadge">User</span>
-            </div>
-            <div class="actions">
-                <button class="btn-icon" onclick="openAI()">🤖 AI Chat</button>
-                <button class="btn-icon" onclick="toggleTheme()">🌓 Theme</button>
-                <button class="btn-icon" onclick="handleLogout()">🚪 Logout</button>
-            </div>
-        </div>
-
-        <div class="header">
-            <h1>Asset Management</h1>
-            <p>Track and manage your assets efficiently</p>
-        </div>
-
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-label">Total Assets</div>
-                <div class="stat-value" id="totalAssets">0</div>
-            </div>
-            <div class="stat-card emerald">
-                <div class="stat-label">Active Assets</div>
-                <div class="stat-value" id="activeAssets">0</div>
-            </div>
-            <div class="stat-card violet">
-                <div class="stat-label">Total Value</div>
-                <div class="stat-value" id="totalValue">₹0</div>
-            </div>
-        </div>
-
-        <div class="grid">
-            <div class="card" id="formCard">
-                <h2 id="formTitle">Add Asset</h2>
-                <div class="form-group">
-                    <label>Asset Name *</label>
-                    <input type="text" id="assetName" placeholder="e.g., Dell Laptop">
-                </div>
-                <div class="form-group">
-                    <label>Type *</label>
-                    <select id="assetType">
-                        <option value="">Select Type</option>
-                        <option value="Hardware">Hardware</option>
-                        <option value="Software">Software</option>
-                        <option value="Furniture">Furniture</option>
-                        <option value="Vehicle">Vehicle</option>
-                        <option value="Equipment">Equipment</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Value (₹)</label>
-                    <input type="number" id="assetValue" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>Status *</label>
-                    <select id="assetStatus">
-                        <option value="Active">Active</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Retired">Retired</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" id="assetLocation" placeholder="e.g., Office Floor 2">
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="assetDesc" rows="2" placeholder="Additional details"></textarea>
-                </div>
-                <button class="btn" onclick="saveAsset()" id="saveBtn">Add Asset</button>
-                <button class="btn" onclick="cancelEdit()" id="cancelBtn" style="display:none; margin-top:0.5rem; background:#64748b;">Cancel</button>
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="brand">🏢 AssetPro</div>
+            
+            <div id="sidebarMenu">
+                <!-- Links injected via JS based on Role -->
             </div>
 
-            <div class="card">
-                <h2>Assets Inventory</h2>
-                <div class="form-group">
-                    <input type="text" id="searchBox" placeholder="Search assets..." oninput="loadAssets()">
+            <div style="margin-top: auto;">
+                <div class="nav-item" onclick="logout()">
+                    🚪 Logout
                 </div>
-                <div class="assets-list" id="assetsList">
-                    <div class="empty">
-                        <h3>No assets found</h3>
-                        <p>Add your first asset to get started</p>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-header">
+                <div>
+                    <h2 id="pageTitle">Dashboard</h2>
+                    <p style="color: #94a3b8;" id="welcomeText">Welcome back</p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span class="badge badge-avail" id="userRoleBadge">ROLE</span>
+                    <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        <span id="userInitials">U</span>
                     </div>
                 </div>
+            </div>
+
+            <!-- SECTIONS -->
+
+            <!-- 1. DASHBOARD HOME (Admin) -->
+            <div id="sec-dashboard" class="section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div style="color: #94a3b8;">Total Assets</div>
+                        <div class="stat-val" id="statTotal">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="color: #94a3b8;">Assigned</div>
+                        <div class="stat-val" style="color: var(--warning)" id="statAssigned">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="color: #94a3b8;">Available</div>
+                        <div class="stat-val" style="color: var(--success)" id="statAvail">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="color: #94a3b8;">Pending Requests</div>
+                        <div class="stat-val" style="color: var(--danger)" id="statRequests">0</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+                    <div class="chart-wrapper">
+                        <canvas id="assetChart"></canvas>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Quick Actions</h3>
+                        <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                            <button class="btn" onclick="openAssetModal()">+ Add New Asset</button>
+                            <button class="btn btn-blue" onclick="navTo('sec-users')">Manage Users</button>
+                            <button class="btn btn-blue" onclick="navTo('sec-requests')">View Requests</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. INVENTORY (Admin/View) -->
+            <div id="sec-inventory" class="section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <h3>All Assets</h3>
+                    <input type="text" class="form-input" style="width: 250px;" placeholder="Search assets..." onkeyup="renderInventory(this.value)">
+                </div>
+                <div class="table-container">
+                    <table id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- JS fills this --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. MY ASSETS (Employee) -->
+            <div id="sec-myassets" class="section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <h3>My Possessions</h3>
+                    <button class="btn" style="width: auto;" onclick="openRequestModal('issue')">+ Request New Asset</button>
+                </div>
+                <div class="table-container">
+                    <table id="myAssetsTable">
+                        <thead>
+                            <tr>
+                                <th>Asset Name</th>
+                                <th>Date Assigned</th>
+                                <th>Condition</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- JS fills this --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. REQUESTS (Admin/Employee View) -->
+            <div id="sec-requests" class="section">
+                <h3>Asset Requests</h3>
+                <div class="table-container">
+                    <table id="requestsTable">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Type</th>
+                                <th>Asset/Reason</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- JS fills this --></tbody>
+                    </table>
+                </div>
+            </div>
+
+             <!-- 5. USERS (Admin) -->
+             <div id="sec-users" class="section">
+                <h3>User Management</h3>
+                <p style="color: #94a3b8; margin-bottom: 1rem; font-size: 0.9rem;">
+                    Note: New Admin accounts require approval from an existing Admin.
+                </p>
+                <div class="table-container">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Assets Held</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- JS fills this --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. PROFILE -->
+            <div id="sec-profile" class="section">
+                <div class="stat-card" style="max-width: 600px;">
+                    <h3>My Profile</h3>
+                    <div style="margin-top: 1.5rem;">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-input" id="profileName">
+                        </div>
+                        <div class="form-group">
+                            <label>Change Password</label>
+                            <input type="password" class="form-input" id="profilePass" placeholder="New Password">
+                        </div>
+                        <button class="btn" onclick="updateProfile()">Update Profile</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Asset Form Modal -->
+    <div class="modal" id="assetModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1.5rem;">Manage Asset</h3>
+            <input type="hidden" id="assetId">
+            <div class="form-group">
+                <label>Asset Name</label>
+                <input type="text" class="form-input" id="assetName">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select class="form-input" id="assetType">
+                    <option value="Laptop">Laptop</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Accessory">Accessory</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select class="form-input" id="assetStatus">
+                    <option value="Available">Available</option>
+                    <option value="In-Use">In-Use</option>
+                    <option value="Damaged">Damaged</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Lost">Lost</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn" onclick="saveAsset()">Save Asset</button>
+                <button class="btn btn-danger" onclick="closeModal('assetModal')">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- AI Modal -->
-    <div class="modal" id="aiModal">
+    <!-- Assign Asset Modal -->
+    <div class="modal" id="assignModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>🤖 AI Assistant</h2>
-                <button class="btn-close" onclick="closeAI()">Close</button>
+            <h3>Assign Asset</h3>
+            <p id="assignAssetName" style="color: var(--primary); margin-bottom: 1rem;"></p>
+            <input type="hidden" id="assignAssetId">
+            <div class="form-group">
+                <label>Select Employee</label>
+                <select class="form-input" id="assignUserSelect"></select>
             </div>
-            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; max-height: 400px; overflow-y: auto;" id="chatBox">
-                <p style="opacity: 0.7; color: white;">Hello! Ask me anything about asset management.</p>
+            <button class="btn" onclick="processAssignment()">Assign</button>
+            <button class="btn btn-danger" style="margin-top: 0.5rem" onclick="closeModal('assignModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Request/Return Modal -->
+    <div class="modal" id="requestModal">
+        <div class="modal-content">
+            <h3 id="reqModalTitle">Request</h3>
+            <input type="hidden" id="reqType"> <!-- issue or return -->
+            <input type="hidden" id="reqAssetId"> <!-- for returns -->
+            
+            <div class="form-group" id="reqAssetGroup">
+                <label>Asset Name / Category</label>
+                <input type="text" class="form-input" id="reqAssetName" placeholder="E.g. Macbook Pro M1">
             </div>
-            <div class="form-group" style="margin-bottom: 0.5rem;">
-                <textarea id="aiInput" rows="3" placeholder="Type your question..."></textarea>
+            
+            <div class="form-group">
+                <label>Reason / Condition Details</label>
+                <textarea class="form-input" id="reqReason" rows="3"></textarea>
             </div>
-            <button class="btn" onclick="sendMessage()">Send</button>
+
+            <button class="btn" onclick="submitRequest()">Submit Request</button>
+            <button class="btn btn-danger" style="margin-top: 0.5rem" onclick="closeModal('requestModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- History/Log Modal -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3>Asset History</h3>
+            <div style="margin-top: 1rem; max-height: 300px; overflow-y: auto;" id="historyContent">
+                <!-- Logs go here -->
+            </div>
+            <button class="btn btn-danger" style="margin-top: 1rem" onclick="closeModal('historyModal')">Close</button>
         </div>
     </div>
 
     <script>
-        let currentUser = null;
-        let assets = [];
-        let editId = null;
-        
-        // Initialize users
-        let users = [
-            {id: 1, username: 'admin', password: 'admin123', name: 'Admin User', role: 'admin'},
-            {id: 2, username: 'employee', password: 'emp123', name: 'Employee User', role: 'employee'}
+        // --- DATA STORE ---
+        let users = JSON.parse(localStorage.getItem('ams_users')) || [
+            { id: 1, name: 'System Admin', username: 'admin', password: 'admin123', role: 'admin', isApproved: true }
         ];
+        let assets = JSON.parse(localStorage.getItem('ams_assets')) || [];
+        let requests = JSON.parse(localStorage.getItem('ams_requests')) || [];
+        let currentUser = null;
+        let chartInstance = null;
 
+        // --- AUTH LOGIC ---
         function init() {
-            // Load users
-            const savedUsers = localStorage.getItem('users');
-            if (savedUsers) {
-                users = JSON.parse(savedUsers);
-            } else {
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-            
-            // Check if user is already logged in
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showDashboard();
-            }
-            loadAssets();
-        }
-        
-        // Initialize on page load
-        window.onload = init;
-
-        function switchTab(tab) {
-            // Not needed anymore - keeping for compatibility
-        }
-
-
-
-        function handleRegister() {
-            const username = document.getElementById('regUser').value.trim();
-            const password = document.getElementById('regPass').value.trim();
-            const name = document.getElementById('regName').value.trim();
-            const role = document.getElementById('regRole').value;
-
-            if (!username || !password || !name) {
-                alert('कृपया सभी fields भरें!');
-                return;
-            }
-
-            if (users.find(u => u.username === username)) {
-                alert('यह username पहले से मौजूद है! कृपया दूसरा username चुनें।');
-                return;
-            }
-
-            const newUser = {
-                id: Date.now(),
-                username: username,
-                password: password,
-                name: name,
-                role: role
-            };
-
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            alert('✅ Registration सफल! अब आप अपने role के अनुसार login कर सकते हैं।');
-            
-            // Clear form
-            document.getElementById('regUser').value = '';
-            document.getElementById('regPass').value = '';
-            document.getElementById('regName').value = '';
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showDashboard() {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('dashboard').classList.add('active');
-            document.getElementById('userName').textContent = 'Welcome, ' + currentUser.name;
-            document.getElementById('userBadge').textContent = currentUser.role.toUpperCase();
-            document.getElementById('userBadge').className = 'badge badge-' + currentUser.role;
-            
-            // Hide form for employees
-            if (currentUser.role === 'employee') {
-                document.getElementById('formCard').style.display = 'none';
-            } else {
-                document.getElementById('formCard').style.display = 'block';
-            }
-            
-            loadAssets();
-        }
-
-        function handleLogout() {
-            // Clear session
-            sessionStorage.clear();
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            
-            // Hide dashboard
-            document.getElementById('dashboard').style.display = 'none';
-            
-            // Show login page
-            const loginPage = document.getElementById('loginPage');
-            loginPage.style.display = 'flex';
-            loginPage.classList.remove('hidden');
-            
-            // Clear all login fields
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            
-            // Reset role to admin
-            selectRole('admin');
-            
-            // Reload page to ensure clean state
-            setTimeout(() => {
-                location.reload();
-            }, 100);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-        }
-
-        function saveAsset() {
-            if (currentUser.role !== 'admin') {
-                alert('सिर्फ Admin ही assets add/edit कर सकते हैं!');
-                return;
-            }
-
-            const name = document.getElementById('assetName').value.trim();
-            const type = document.getElementById('assetType').value;
-            const value = document.getElementById('assetValue').value || '0';
-            const status = document.getElementById('assetStatus').value;
-            const location = document.getElementById('assetLocation').value.trim();
-            const description = document.getElementById('assetDesc').value.trim();
-
-            if (!name || !type || !status) {
-                alert('कृपया सभी required fields भरें (Name, Type, Status)');
-                return;
-            }
-
-            const asset = {
-                id: editId || Date.now(),
-                name: name,
-                type: type,
-                value: parseFloat(value),
-                status: status,
-                location: location,
-                description: description,
-                createdBy: currentUser.name,
-                createdAt: editId ? assets.find(a => a.id === editId).createdAt : new Date().toISOString()
-            };
-
-            if (editId) {
-                const index = assets.findIndex(a => a.id === editId);
-                assets[index] = asset;
-                editId = null;
-                document.getElementById('formTitle').textContent = 'Add Asset';
-                document.getElementById('saveBtn').textContent = 'Add Asset';
-                document.getElementById('cancelBtn').style.display = 'none';
-            } else {
-                assets.push(asset);
-            }
-
-            localStorage.setItem('assets', JSON.stringify(assets));
-            
-            // Clear form
-            document.getElementById('assetName').value = '';
-            document.getElementById('assetType').value = '';
-            document.getElementById('assetValue').value = '';
-            document.getElementById('assetStatus').value = 'Active';
-            document.getElementById('assetLocation').value = '';
-            document.getElementById('assetDesc').value = '';
-            
-            loadAssets();
-            alert('Asset successfully saved!');
-        }
-
-        function cancelEdit() {
-            editId = null;
-            document.getElementById('formTitle').textContent = 'Add Asset';
-            document.getElementById('saveBtn').textContent = 'Add Asset';
-            document.getElementById('cancelBtn').style.display = 'none';
-            
-            // Clear form
-            document.getElementById('assetName').value = '';
-            document.getElementById('assetType').value = '';
-            document.getElementById('assetValue').value = '';
-            document.getElementById('assetStatus').value = 'Active';
-            document.getElementById('assetLocation').value = '';
-            document.getElementById('assetDesc').value = '';
-        }
-
-        function loadAssets() {
-            const savedAssets = localStorage.getItem('assets');
-            if (savedAssets) {
-                assets = JSON.parse(savedAssets);
-            }
-
-            const searchTerm = document.getElementById('searchBox')?.value.toLowerCase() || '';
-            const filteredAssets = assets.filter(a => 
-                a.name.toLowerCase().includes(searchTerm) ||
-                a.type.toLowerCase().includes(searchTerm) ||
-                a.location.toLowerCase().includes(searchTerm)
-            );
-
-            // Update stats
-            document.getElementById('totalAssets').textContent = assets.length;
-            document.getElementById('activeAssets').textContent = assets.filter(a => a.status === 'Active').length;
-            document.getElementById('totalValue').textContent = '₹' + assets.reduce((sum, a) => sum + (a.value || 0), 0).toLocaleString();
-
-            const listContainer = document.getElementById('assetsList');
-            
-            if (filteredAssets.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="empty">
-                        <h3>No assets found</h3>
-                        <p>${searchTerm ? 'Try a different search term' : 'Add your first asset to get started'}</p>
-                    </div>
-                `;
-                return;
-            }
-
-            listContainer.innerHTML = filteredAssets.map(asset => `
-                <div class="asset-item">
-                    <div class="asset-header">
-                        <div>
-                            <div class="asset-name">${asset.name}</div>
-                            <span class="status status-${asset.status.toLowerCase()}">${asset.status}</span>
-                        </div>
-                        ${currentUser && currentUser.role === 'admin' ? `
-                        <div class="asset-actions">
-                            <button class="btn-sm btn-edit" onclick="editAsset(${asset.id})">Edit</button>
-                            <button class="btn-sm btn-delete" onclick="deleteAsset(${asset.id})">Delete</button>
-                        </div>
-                        ` : ''}
-                    </div>
-                    <div class="asset-details">
-                        <div><strong>Type:</strong> ${asset.type}</div>
-                        <div><strong>Value:</strong> ₹${asset.value.toLocaleString()}</div>
-                        <div><strong>Location:</strong> ${asset.location || 'N/A'}</div>
-                        <div><strong>Created By:</strong> ${asset.createdBy}</div>
-                        ${asset.description ? `<div style="grid-column: 1 / -1;"><strong>Description:</strong> ${asset.description}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function editAsset(id) {
-            if (currentUser.role !== 'admin') {
-                alert('सिर्फ Admin ही assets edit कर सकते हैं!');
-                return;
-            }
-
-            const asset = assets.find(a => a.id === id);
-            if (!asset) return;
-
-            editId = id;
-            document.getElementById('assetName').value = asset.name;
-            document.getElementById('assetType').value = asset.type;
-            document.getElementById('assetValue').value = asset.value;
-            document.getElementById('assetStatus').value = asset.status;
-            document.getElementById('assetLocation').value = asset.location;
-            document.getElementById('assetDesc').value = asset.description;
-
-            document.getElementById('formTitle').textContent = 'Edit Asset';
-            document.getElementById('saveBtn').textContent = 'Update Asset';
-            document.getElementById('cancelBtn').style.display = 'block';
-
-            // Scroll to form
-            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function deleteAsset(id) {
-            if (currentUser.role !== 'admin') {
-                alert('सिर्फ Admin ही assets delete कर सकते हैं!');
-                return;
-            }
-
-            if (confirm('क्या आप इस asset को delete करना चाहते हैं?')) {
-                assets = assets.filter(a => a.id !== id);
-                localStorage.setItem('assets', JSON.stringify(assets));
-                loadAssets();
+            if(sessionStorage.getItem('ams_user')) {
+                currentUser = JSON.parse(sessionStorage.getItem('ams_user'));
+                loadDashboard();
             }
         }
 
-        function openAI() {
-            document.getElementById('aiModal').classList.add('show');
-        }
-
-        function closeAI() {
-            document.getElementById('aiModal').classList.remove('show');
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('aiInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-
-            const chatBox = document.getElementById('chatBox');
-            
-            // Add user message
-            chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(59, 130, 246, 0.2); border-radius: 0.5rem; color: white;"><strong>You:</strong> ${message}</p>`;
-            input.value = '';
-            
-            // Add loading indicator
-            chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; color: white;" id="aiLoading"><strong>AI:</strong> Thinking...</p>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const response = await fetch("https://api.anthropic.com/v1/messages", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514",
-                        max_tokens: 1000,
-                        messages: [
-                            { 
-                                role: "user", 
-                                content: `You are an AI assistant for an asset management system. Current user: ${currentUser.name} (${currentUser.role}). Total assets: ${assets.length}. User question: ${message}. Please provide helpful, concise answers about asset management.`
-                            }
-                        ],
-                    })
-                });
-
-                const data = await response.json();
-                const aiResponse = data.content[0].text;
-
-                // Remove loading and add response
-                document.getElementById('aiLoading').remove();
-                chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; color: white;"><strong>AI:</strong> ${aiResponse}</p>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-                
-            } catch (error) {
-                document.getElementById('aiLoading').remove();
-                chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border-radius: 0.5rem; color: white;"><strong>Error:</strong> Could not connect to AI. Please try again.</p>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-
-        // Role selection functions
-        let selectedRole = 'admin';
-
-        function selectRole(role) {
-            selectedRole = role;
-            const adminBtn = document.getElementById('adminRoleBtn');
-            const employeeBtn = document.getElementById('employeeRoleBtn');
-            const demoText = document.getElementById('demoText');
-            
-            if (role === 'admin') {
-                adminBtn.classList.add('active');
-                employeeBtn.classList.remove('active');
-                demoText.textContent = 'Demo: admin/admin123';
-            } else {
-                employeeBtn.classList.add('active');
-                adminBtn.classList.remove('active');
-                demoText.textContent = 'Demo: employee/emp123';
-            }
+        function toggleForms(type) {
+            document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
         }
 
         function handleLogin() {
-            const username = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value.trim();
-            
-            if (!username || !password) {
-                alert('कृपया username और password दोनों भरें!');
-                return;
-            }
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            const user = users.find(x => x.username === u && x.password === p);
 
-            const user = users.find(u => u.username === username && u.password === password && u.role === selectedRole);
-            
-            if (user) {
+            if(user) {
+                if(user.role === 'admin' && !user.isApproved) {
+                    alert('⚠️ Your Admin account is pending approval from the main administrator.');
+                    return;
+                }
                 currentUser = user;
-                sessionStorage.setItem('currentUser', JSON.stringify(user));
-                
-                document.getElementById('loginUser').value = '';
-                document.getElementById('loginPass').value = '';
-                
-                showDashboard();
+                sessionStorage.setItem('ams_user', JSON.stringify(user));
+                loadDashboard();
             } else {
-                alert(`गलत credentials! या आप ${selectedRole} नहीं हैं।`);
+                alert('Invalid credentials');
             }
         }
 
-        function showRegister() {
-            document.getElementById('registerModal').classList.add('show');
+        function handleRegister() {
+            const name = document.getElementById('regName').value;
+            const user = document.getElementById('regUser').value;
+            const pass = document.getElementById('regPass').value;
+            const role = document.getElementById('regRole').value;
+
+            if(!name || !user || !pass) return alert('Fill all fields');
+            if(users.find(x => x.username === user)) return alert('Username taken');
+
+            // Admin Logic: Check if ANY admin exists. If yes, new admin is unapproved.
+            let isApproved = true;
+            if(role === 'admin') {
+                const existingAdmin = users.find(u => u.role === 'admin' && u.isApproved);
+                if(existingAdmin) {
+                    isApproved = false;
+                    alert('⚠️ As an Admin already exists, your account will require approval.');
+                }
+            }
+
+            const newUser = { id: Date.now(), name, username: user, password: pass, role, isApproved };
+            users.push(newUser);
+            saveData();
+            
+            toggleForms('login');
+            if(isApproved) {
+                alert('Registration successful! Please login.');
+            }
         }
 
-        function hideRegister() {
-            document.getElementById('registerModal').classList.remove('show');
+        function logout() {
+            sessionStorage.removeItem('ams_user');
+            location.reload();
         }
 
-        let generatedOTP = null;
-        let otpUsername = null;
-
-        function showForgotPassword() {
-            // Reset form
-            document.getElementById('otpRequestSection').style.display = 'block';
-            document.getElementById('otpVerifySection').style.display = 'none';
-            document.getElementById('forgotUser').value = '';
-            document.getElementById('otpInput').value = '';
-            document.getElementById('forgotNewPass').value = '';
-            document.getElementById('forgotConfirmPass').value = '';
-            generatedOTP = null;
-            otpUsername = null;
+        // --- DASHBOARD RENDERING ---
+        function loadDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('welcomeText').innerText = `Welcome back, ${currentUser.name}`;
+            document.getElementById('userInitials').innerText = currentUser.name.charAt(0);
             
-            document.getElementById('forgotModal').classList.add('show');
+            const roleBadge = document.getElementById('userRoleBadge');
+            roleBadge.innerText = currentUser.role.toUpperCase();
+            roleBadge.className = `badge ${currentUser.role === 'admin' ? 'badge-warn' : 'badge-avail'}`;
+
+            renderSidebar();
+            
+            if(currentUser.role === 'admin') {
+                navTo('sec-dashboard');
+            } else {
+                navTo('sec-myassets');
+            }
         }
 
-        function hideForgotPassword() {
-            document.getElementById('forgotModal').classList.remove('show');
-            // Reset form
-            document.getElementById('otpRequestSection').style.display = 'block';
-            document.getElementById('otpVerifySection').style.display = 'none';
-            generatedOTP = null;
-            otpUsername = null;
+        function renderSidebar() {
+            const menu = document.getElementById('sidebarMenu');
+            let html = '';
+
+            if(currentUser.role === 'admin') {
+                html += `<div class="nav-item" onclick="navTo('sec-dashboard')">📊 Dashboard</div>`;
+                html += `<div class="nav-item" onclick="navTo('sec-inventory')">📦 Inventory</div>`;
+                html += `<div class="nav-item" onclick="navTo('sec-requests')">📨 Requests</div>`;
+                html += `<div class="nav-item" onclick="navTo('sec-users')">👥 Users</div>`;
+            } else {
+                html += `<div class="nav-item" onclick="navTo('sec-myassets')">🎒 My Assets</div>`;
+                html += `<div class="nav-item" onclick="navTo('sec-requests')">📨 My Requests</div>`;
+            }
+            html += `<div class="nav-item" onclick="navTo('sec-profile')">👤 Profile</div>`;
+            menu.innerHTML = html;
         }
 
-        function sendOTP() {
-            const username = document.getElementById('forgotUser').value.trim();
+        function navTo(secId) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(secId).classList.add('active');
             
-            if (!username) {
-                alert('कृपया username भरें!');
-                return;
-            }
-
-            const user = users.find(u => u.username === username);
-            
-            if (!user) {
-                alert('यह username registered नहीं है!');
-                return;
-            }
-
-            // Generate 6-digit OTP
-            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-            otpUsername = username;
-            
-            // Show OTP in alert (in real app, this would be sent via email/SMS)
-            alert(`✅ OTP sent successfully!\n\nYour OTP is: ${generatedOTP}\n\n(In production, this would be sent to your email/phone)`);
-            
-            // Show OTP verification section
-            document.getElementById('otpRequestSection').style.display = 'none';
-            document.getElementById('otpVerifySection').style.display = 'block';
-            document.getElementById('otpSentMsg').textContent = `OTP sent to ${username}'s registered contact`;
-            
-            console.log('Generated OTP:', generatedOTP); // For testing
+            // Refresh data based on view
+            if(secId === 'sec-dashboard') updateStatsAndChart();
+            if(secId === 'sec-inventory') renderInventory();
+            if(secId === 'sec-myassets') renderMyAssets();
+            if(secId === 'sec-requests') renderRequests();
+            if(secId === 'sec-users') renderUsers();
+            if(secId === 'sec-profile') loadProfile();
         }
 
-        function handleForgotPassword() {
-            const enteredOTP = document.getElementById('otpInput').value.trim();
-            const newPass = document.getElementById('forgotNewPass').value.trim();
-            const confirmPass = document.getElementById('forgotConfirmPass').value.trim();
+        // --- ADMIN: DASHBOARD & CHARTS ---
+        function updateStatsAndChart() {
+            const total = assets.length;
+            const assigned = assets.filter(a => a.status === 'In-Use').length;
+            const avail = assets.filter(a => a.status === 'Available').length;
+            const damaged = assets.filter(a => a.status === 'Damaged' || a.status === 'Maintenance').length;
+            const pending = requests.filter(r => r.status === 'Pending').length;
 
-            if (!enteredOTP || !newPass || !confirmPass) {
-                alert('कृपया सभी fields भरें!');
-                return;
-            }
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statAssigned').innerText = assigned;
+            document.getElementById('statAvail').innerText = avail;
+            document.getElementById('statRequests').innerText = pending;
 
-            if (enteredOTP !== generatedOTP) {
-                alert('❌ गलत OTP! कृपया सही OTP enter करें।');
-                return;
-            }
+            const ctx = document.getElementById('assetChart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
 
-            if (newPass !== confirmPass) {
-                alert('❌ Passwords match नहीं हो रहे!');
-                return;
-            }
-
-            if (newPass.length < 6) {
-                alert('Password कम से कम 6 characters का होना चाहिए!');
-                return;
-            }
-
-            // Update password
-            const userIndex = users.findIndex(u => u.username === otpUsername);
-            users[userIndex].password = newPass;
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            alert('✅ Password successfully reset! अब आप नए password से login कर सकते हैं।');
-            
-            hideForgotPassword();
-        }
-
-        // Allow Enter key to send message
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup role buttons
-            const adminBtn = document.getElementById('adminRoleBtn');
-            const employeeBtn = document.getElementById('employeeRoleBtn');
-            
-            if (adminBtn) {
-                adminBtn.addEventListener('click', function() {
-                    selectRole('admin');
-                });
-            }
-            
-            if (employeeBtn) {
-                employeeBtn.addEventListener('click', function() {
-                    selectRole('employee');
-                });
-            }
-            
-            // Setup login button
-            const loginBtn = document.getElementById('loginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', handleLogin);
-            }
-            
-            // Setup register link
-            const registerLink = document.getElementById('registerLink');
-            if (registerLink) {
-                registerLink.addEventListener('click', showRegister);
-            }
-            
-            // Setup forgot password link
-            const forgotLink = document.getElementById('forgotLink');
-            if (forgotLink) {
-                forgotLink.addEventListener('click', showForgotPassword);
-            }
-            
-            // Setup register button
-            const registerBtn = document.getElementById('registerBtn');
-            if (registerBtn) {
-                registerBtn.addEventListener('click', handleRegister);
-            }
-            
-            // Setup back from register
-            const backFromRegister = document.getElementById('backFromRegister');
-            if (backFromRegister) {
-                backFromRegister.addEventListener('click', hideRegister);
-            }
-            
-            // Setup send OTP button
-            const sendOtpBtn = document.getElementById('sendOtpBtn');
-            if (sendOtpBtn) {
-                sendOtpBtn.addEventListener('click', sendOTP);
-            }
-            
-            // Setup resend OTP button
-            const resendOtpBtn = document.getElementById('resendOtpBtn');
-            if (resendOtpBtn) {
-                resendOtpBtn.addEventListener('click', sendOTP);
-            }
-            
-            // Setup reset password button
-            const resetPasswordBtn = document.getElementById('resetPasswordBtn');
-            if (resetPasswordBtn) {
-                resetPasswordBtn.addEventListener('click', handleForgotPassword);
-            }
-            
-            // Setup back from forgot
-            const backFromForgot = document.getElementById('backFromForgot');
-            if (backFromForgot) {
-                backFromForgot.addEventListener('click', hideForgotPassword);
-            }
-            
-            // AI input enter key
-            const aiInput = document.getElementById('aiInput');
-            if (aiInput) {
-                aiInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Available', 'In-Use', 'Damaged/Maint', 'Lost'],
+                    datasets: [{
+                        data: [
+                            avail, 
+                            assigned, 
+                            damaged,
+                            assets.filter(a => a.status === 'Lost').length
+                        ],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: 'white' } }
                     }
-                });
-            }
-        });
+                }
+            });
+        }
 
-        function init() {
-            // Load users
-            const savedUsers = localStorage.getItem('users');
-            if (savedUsers) {
-                users = JSON.parse(savedUsers);
+        // --- ASSET MANAGEMENT (CRUD) ---
+        function renderInventory(search = '') {
+            const tbody = document.querySelector('#inventoryTable tbody');
+            tbody.innerHTML = '';
+            
+            const filtered = assets.filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
+
+            filtered.forEach(asset => {
+                const assignedUser = users.find(u => u.id === asset.assignedTo);
+                const userName = assignedUser ? assignedUser.name : '-';
+                
+                let badgeClass = 'badge-avail';
+                if(asset.status === 'In-Use') badgeClass = 'badge-busy';
+                if(asset.status === 'Damaged' || asset.status === 'Lost') badgeClass = 'badge-bad';
+
+                let actions = `
+                    <button class="action-btn btn-blue" onclick="editAsset(${asset.id})">Edit</button>
+                    <button class="action-btn" onclick="viewHistory(${asset.id})">Logs</button>
+                `;
+
+                if(asset.status === 'Available') {
+                    actions += `<button class="action-btn" style="background:#10b981" onclick="openAssignModal(${asset.id})">Assign</button>`;
+                } else if(asset.status === 'In-Use') {
+                    actions += `<button class="action-btn" style="background:#f59e0b" onclick="adminReturnAsset(${asset.id})">Return</button>`;
+                }
+
+                const tr = `
+                    <tr>
+                        <td>${asset.name}</td>
+                        <td>${asset.type}</td>
+                        <td><span class="badge ${badgeClass}">${asset.status}</span></td>
+                        <td>${userName}</td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += tr;
+            });
+        }
+
+        function openAssetModal() {
+            document.getElementById('assetId').value = '';
+            document.getElementById('assetName').value = '';
+            document.getElementById('assetStatus').value = 'Available';
+            document.getElementById('assetModal').classList.add('show');
+        }
+
+        function editAsset(id) {
+            const asset = assets.find(a => a.id === id);
+            document.getElementById('assetId').value = asset.id;
+            document.getElementById('assetName').value = asset.name;
+            document.getElementById('assetType').value = asset.type;
+            document.getElementById('assetStatus').value = asset.status;
+            document.getElementById('assetModal').classList.add('show');
+        }
+
+        function saveAsset() {
+            const id = document.getElementById('assetId').value;
+            const name = document.getElementById('assetName').value;
+            const type = document.getElementById('assetType').value;
+            const status = document.getElementById('assetStatus').value;
+
+            if(id) {
+                // Edit
+                const asset = assets.find(a => a.id == id);
+                // Log status change
+                if(asset.status !== status) addLog(asset.id, `Status changed from ${asset.status} to ${status}`);
+                asset.name = name;
+                asset.type = type;
+                asset.status = status;
+                // If status changed to Available manually, unassign
+                if(status === 'Available') asset.assignedTo = null;
             } else {
-                localStorage.setItem('users', JSON.stringify(users));
+                // New
+                const newAsset = {
+                    id: Date.now(),
+                    name, type, status,
+                    assignedTo: null,
+                    history: []
+                };
+                newAsset.history.push({date: new Date().toLocaleDateString(), action: 'Created', user: currentUser.name});
+                assets.push(newAsset);
+            }
+            saveData();
+            closeModal('assetModal');
+            if(currentUser.role === 'admin') updateStatsAndChart(); // refresh chart
+            renderInventory();
+        }
+
+        // --- ASSIGNMENT LOGIC ---
+        function openAssignModal(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            document.getElementById('assignAssetId').value = assetId;
+            document.getElementById('assignAssetName').innerText = asset.name;
+            
+            const select = document.getElementById('assignUserSelect');
+            select.innerHTML = '';
+            users.filter(u => u.role === 'employee').forEach(u => {
+                select.innerHTML += `<option value="${u.id}">${u.name} (${u.username})</option>`;
+            });
+            
+            document.getElementById('assignModal').classList.add('show');
+        }
+
+        function processAssignment() {
+            const assetId = document.getElementById('assignAssetId').value;
+            const userId = document.getElementById('assignUserSelect').value;
+            const asset = assets.find(a => a.id == assetId);
+            const user = users.find(u => u.id == userId);
+
+            asset.assignedTo = parseInt(userId);
+            asset.status = 'In-Use';
+            addLog(asset.id, `Assigned to ${user.name} by Admin`);
+            
+            saveData();
+            closeModal('assignModal');
+            renderInventory();
+            updateStatsAndChart();
+        }
+
+        function adminReturnAsset(assetId) {
+            if(!confirm('Confirm return of this asset?')) return;
+            const asset = assets.find(a => a.id == assetId);
+            const user = users.find(u => u.id === asset.assignedTo);
+            
+            asset.assignedTo = null;
+            asset.status = 'Available';
+            addLog(asset.id, `Returned from ${user ? user.name : 'Unknown'}`);
+            
+            saveData();
+            renderInventory();
+            updateStatsAndChart();
+        }
+
+        // --- EMPLOYEE FEATURES ---
+        function renderMyAssets() {
+            const tbody = document.querySelector('#myAssetsTable tbody');
+            tbody.innerHTML = '';
+            
+            const myAssets = assets.filter(a => a.assignedTo === currentUser.id);
+
+            if(myAssets.length === 0) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No assets assigned</td></tr>';
+
+            myAssets.forEach(asset => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${asset.name} <br> <small style="color:#94a3b8">${asset.type}</small></td>
+                        <td>${asset.history.find(h=>h.action.includes('Assigned'))?.date || 'N/A'}</td>
+                        <td>${asset.status}</td>
+                        <td>
+                            <button class="action-btn btn-blue" onclick="openRequestModal('return', ${asset.id})">Return / Report</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openRequestModal(type, assetId = null) {
+            document.getElementById('reqType').value = type;
+            document.getElementById('reqAssetId').value = assetId || '';
+            document.getElementById('reqModalTitle').innerText = type === 'issue' ? 'Request New Asset' : 'Return / Report Damage';
+            
+            // If return, hide name input, auto-fill from JS logic not needed for UI simplicity, just hide text input
+            if(type === 'return') {
+                const asset = assets.find(a => a.id === assetId);
+                document.getElementById('reqAssetName').value = asset.name;
+                document.getElementById('reqAssetName').disabled = true;
+            } else {
+                document.getElementById('reqAssetName').value = '';
+                document.getElementById('reqAssetName').disabled = false;
             }
             
-            // Check if user is already logged in
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showDashboard();
-            }
-            loadAssets();
+            document.getElementById('reqReason').value = '';
+            document.getElementById('requestModal').classList.add('show');
         }
-        
-        // Initialize on page load
+
+        function submitRequest() {
+            const type = document.getElementById('reqType').value;
+            const assetId = document.getElementById('reqAssetId').value;
+            const name = document.getElementById('reqAssetName').value;
+            const reason = document.getElementById('reqReason').value;
+
+            const req = {
+                id: Date.now(),
+                userId: currentUser.id,
+                userName: currentUser.name,
+                type: type, // 'issue' or 'return'
+                assetName: name, // For issue: Requested Item. For return: Actual Asset Name
+                relatedAssetId: assetId,
+                reason: reason,
+                date: new Date().toLocaleDateString(),
+                status: 'Pending'
+            };
+
+            requests.push(req);
+            saveData();
+            closeModal('requestModal');
+            alert('Request sent successfully');
+            if(currentUser.role === 'employee') renderRequests(); // Employee view
+        }
+
+        // --- REQUEST MANAGEMENT ---
+        function renderRequests() {
+            const tbody = document.querySelector('#requestsTable tbody');
+            tbody.innerHTML = '';
+
+            let displayReqs = requests;
+            // Employees only see their own
+            if(currentUser.role === 'employee') {
+                displayReqs = requests.filter(r => r.userId === currentUser.id);
+            }
+
+            displayReqs.sort((a,b) => b.id - a.id).forEach(r => {
+                let actions = '';
+                if(currentUser.role === 'admin' && r.status === 'Pending') {
+                    actions = `
+                        <button class="action-btn" style="background:#10b981" onclick="handleRequest(${r.id}, 'Approved')">Approve</button>
+                        <button class="action-btn btn-danger" onclick="handleRequest(${r.id}, 'Rejected')">Reject</button>
+                    `;
+                } else {
+                    actions = `<span class="badge ${r.status === 'Approved' ? 'badge-avail' : (r.status === 'Rejected' ? 'badge-bad' : 'badge-warn')}">${r.status}</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.userName}</td>
+                        <td>${r.type.toUpperCase()}</td>
+                        <td>${r.assetName}<br><small>${r.reason}</small></td>
+                        <td>${r.date}</td>
+                        <td><span class="badge badge-warn">${r.status}</span></td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function handleRequest(reqId, action) {
+            const req = requests.find(r => r.id === reqId);
+            req.status = action;
+
+            if(action === 'Approved') {
+                if(req.type === 'return' && req.relatedAssetId) {
+                    // Process return logic automatically
+                    const asset = assets.find(a => a.id == req.relatedAssetId);
+                    if(asset) {
+                        asset.assignedTo = null;
+                        asset.status = 'Available'; // Or 'Maintenance' based on reason (simplified here)
+                        addLog(asset.id, `Return Approved. Notes: ${req.reason}`);
+                    }
+                }
+                // For 'issue', Admin still needs to manually assign an asset via Inventory, 
+                // but marking request as approved acknowledges it.
+            }
+            
+            saveData();
+            renderRequests();
+            updateStatsAndChart();
+        }
+
+        // --- USER MANAGEMENT ---
+        function renderUsers() {
+            const tbody = document.querySelector('#usersTable tbody');
+            tbody.innerHTML = '';
+
+            users.forEach(u => {
+                const assetCount = assets.filter(a => a.assignedTo === u.id).length;
+                let statusBadge = u.isApproved ? '<span class="badge badge-avail">Active</span>' : '<span class="badge badge-warn">Pending Approval</span>';
+                
+                let action = '';
+                if(!u.isApproved && currentUser.role === 'admin') {
+                    action = `<button class="action-btn btn-success" onclick="approveAdmin(${u.id})">Approve Admin</button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.name}</td>
+                        <td>${u.username}</td>
+                        <td>${u.role.toUpperCase()}</td>
+                        <td>${assetCount}</td>
+                        <td>${statusBadge}</td>
+                        <td>${action}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function approveAdmin(userId) {
+            const u = users.find(x => x.id === userId);
+            u.isApproved = true;
+            saveData();
+            renderUsers();
+            alert(`User ${u.name} is now an active Admin.`);
+        }
+
+        function loadProfile() {
+            document.getElementById('profileName').value = currentUser.name;
+        }
+
+        function updateProfile() {
+            const newName = document.getElementById('profileName').value;
+            const newPass = document.getElementById('profilePass').value;
+
+            const u = users.find(x => x.id === currentUser.id);
+            u.name = newName;
+            if(newPass) u.password = newPass;
+
+            currentUser = u; // Update session ref
+            sessionStorage.setItem('ams_user', JSON.stringify(u));
+            saveData();
+            alert('Profile updated!');
+            document.getElementById('welcomeText').innerText = `Welcome back, ${u.name}`;
+        }
+
+        // --- HELPERS ---
+        function addLog(assetId, action) {
+            const asset = assets.find(a => a.id == assetId);
+            if(!asset.history) asset.history = [];
+            asset.history.unshift({
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                action: action,
+                user: currentUser.name
+            });
+        }
+
+        function viewHistory(assetId) {
+            const asset = assets.find(a => a.id == assetId);
+            const container = document.getElementById('historyContent');
+            container.innerHTML = '';
+            
+            if(!asset.history || asset.history.length === 0) {
+                container.innerHTML = '<p>No history recorded.</p>';
+            } else {
+                asset.history.forEach(h => {
+                    container.innerHTML += `
+                        <div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem;">
+                            <div style="color: var(--primary); font-size: 0.8rem;">${h.date} - ${h.user}</div>
+                            <div>${h.action}</div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('historyModal').classList.add('show');
+        }
+
+        function saveData() {
+            localStorage.setItem('ams_users', JSON.stringify(users));
+            localStorage.setItem('ams_assets', JSON.stringify(assets));
+            localStorage.setItem('ams_requests', JSON.stringify(requests));
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        // Start
         window.onload = init;
+
     </script>
+</body>
+</html>
