@@ -80,6 +80,11 @@
             display: none;
         }
 
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
         .login-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
@@ -87,8 +92,6 @@
             padding: 3rem;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 100%;
-            max-width: 450px;
         }
 
         body.light-mode .login-card {
@@ -119,6 +122,147 @@
 
         body.light-mode .login-header p {
             color: #64748b;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-btn {
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            user-select: none;
+        }
+
+        body.light-mode .role-btn {
+            background: rgba(0, 0, 0, 0.05);
+            color: rgba(0, 0, 0, 0.6);
+            border-color: #e2e8f0;
+        }
+
+        .role-btn.active {
+            background: linear-gradient(to right, #0ea5e9, #2563eb);
+            border-color: #0ea5e9;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4);
+        }
+
+        .role-btn:hover:not(.active) {
+            border-color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.1);
+            transform: scale(1.02);
+        }
+
+        .login-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .login-link {
+            color: #7dd3fc;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        body.light-mode .login-link {
+            color: #0284c7;
+        }
+
+        .login-link:hover {
+            color: #0ea5e9;
+            text-decoration: underline;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        body.light-mode .login-header h1 {
+            color: #0f172a;
+        }
+
+        .login-header p {
+            font-size: 1rem;
+            color: #bae6fd;
+            margin-bottom: 0;
+        }
+
+        body.light-mode .login-header p {
+            color: #64748b;
+        }
+
+        .register-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.light-mode .register-section {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        body.light-mode .section-title {
+            color: #0f172a;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
         }
 
         .tabs {
@@ -624,6 +768,8 @@
             .header h1 { font-size: 2rem; }
             .asset-details { grid-template-columns: 1fr; }
             .actions { justify-content: center; }
+            .role-selector { grid-template-columns: 1fr; }
+            .login-card { padding: 2rem; }
         }
     </style>
 </head>
@@ -636,17 +782,25 @@
 
     <!-- Login Page -->
     <div class="login-page" id="loginPage">
-        <div class="login-card">
-            <div class="login-header">
-                <h1>Asset Manager</h1>
-                <p>Secure Login Portal</p>
-            </div>
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('login')">Login</button>
-                <button class="tab" onclick="switchTab('register')">Register</button>
-            </div>
-            
-            <div id="loginForm">
+        <div class="login-container">
+            <!-- Main Login Card -->
+            <div class="login-card" id="loginCard">
+                <div class="login-header">
+                    <h1>🏢 Asset Manager</h1>
+                    <p>Secure Login Portal</p>
+                </div>
+
+                <!-- Role Selection -->
+                <div class="role-selector">
+                    <button type="button" class="role-btn active" id="adminRoleBtn">
+                        <span>👨‍💼</span> <span>Admin</span>
+                    </button>
+                    <button type="button" class="role-btn" id="employeeRoleBtn">
+                        <span>👤</span> <span>Employee</span>
+                    </button>
+                </div>
+
+                <!-- Login Form -->
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="loginUser" placeholder="Enter username">
@@ -655,13 +809,26 @@
                     <label>Password</label>
                     <input type="password" id="loginPass" placeholder="Enter password">
                 </div>
-                <button class="btn" onclick="handleLogin()">Login</button>
-                <p class="demo-text">
-                    Demo: admin/admin123 or employee/emp123
+                
+                <button class="btn" id="loginBtn">Login</button>
+                
+                <div class="login-links">
+                    <a class="login-link" id="registerLink">Create Account</a>
+                    <a class="login-link" id="forgotLink">Forgot Password?</a>
+                </div>
+                
+                <p class="demo-text" id="demoText">
+                    Demo: admin/admin123
                 </p>
             </div>
-            
-            <div id="registerForm" style="display: none;">
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="login-container">
+            <div class="register-section">
+                <h2 class="section-title">📝 Create Account</h2>
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="regUser" placeholder="Choose username">
@@ -681,7 +848,35 @@
                         <option value="admin">Admin</option>
                     </select>
                 </div>
-                <button class="btn" onclick="handleRegister()">Register</button>
+                <button class="btn" id="registerBtn">Register Now</button>
+                <div class="back-link">
+                    <a class="login-link" id="backFromRegister">← Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal-overlay" id="forgotModal">
+        <div class="login-container">
+            <div class="register-section">
+                <h2 class="section-title">🔑 Reset Password</h2>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="forgotUser" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="forgotNewPass" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="forgotConfirmPass" placeholder="Confirm new password">
+                </div>
+                <button class="btn" id="resetPasswordBtn">Reset Password</button>
+                <div class="back-link">
+                    <a class="login-link" id="backFromForgot">← Back to Login</a>
+                </div>
             </div>
         </div>
     </div>
@@ -827,47 +1022,10 @@
         window.onload = init;
 
         function switchTab(tab) {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const tabs = document.querySelectorAll('.tab');
-            
-            if (tab === 'login') {
-                loginForm.style.display = 'block';
-                registerForm.style.display = 'none';
-                tabs[0].classList.add('active');
-                tabs[1].classList.remove('active');
-            } else {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-                tabs[0].classList.remove('active');
-                tabs[1].classList.add('active');
-            }
+            // Not needed anymore - keeping for compatibility
         }
 
-        function handleLogin() {
-            const username = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value.trim();
-            
-            if (!username || !password) {
-                alert('कृपया username और password दोनों भरें!');
-                return;
-            }
 
-            const user = users.find(u => u.username === username && u.password === password);
-            
-            if (user) {
-                currentUser = user;
-                sessionStorage.setItem('currentUser', JSON.stringify(user));
-                
-                // Clear login fields
-                document.getElementById('loginUser').value = '';
-                document.getElementById('loginPass').value = '';
-                
-                showDashboard();
-            } else {
-                alert('गलत username या password! कृपया फिर से कोशिश करें।');
-            }
-        }
 
         function handleRegister() {
             const username = document.getElementById('regUser').value.trim();
@@ -896,13 +1054,15 @@
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             
-            alert('Registration सफल! अब आप login कर सकते हैं।');
+            alert('✅ Registration सफल! अब आप अपने role के अनुसार login कर सकते हैं।');
             
-            // Clear form and switch to login
+            // Clear form
             document.getElementById('regUser').value = '';
             document.getElementById('regPass').value = '';
             document.getElementById('regName').value = '';
-            switchTab('login');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function showDashboard() {
@@ -936,12 +1096,12 @@
             loginPage.style.display = 'flex';
             loginPage.classList.remove('hidden');
             
-            // Clear login fields
+            // Clear all login fields
             document.getElementById('loginUser').value = '';
             document.getElementById('loginPass').value = '';
             
-            // Switch to login tab
-            switchTab('login');
+            // Reset role to admin
+            selectRole('admin');
             
             // Reload page to ensure clean state
             setTimeout(() => {
@@ -1173,8 +1333,162 @@
             }
         }
 
+        // Role selection functions
+        let selectedRole = 'admin';
+
+        function selectRole(role) {
+            selectedRole = role;
+            const adminBtn = document.getElementById('adminRoleBtn');
+            const employeeBtn = document.getElementById('employeeRoleBtn');
+            const demoText = document.getElementById('demoText');
+            
+            if (role === 'admin') {
+                adminBtn.classList.add('active');
+                employeeBtn.classList.remove('active');
+                demoText.textContent = 'Demo: admin/admin123';
+            } else {
+                employeeBtn.classList.add('active');
+                adminBtn.classList.remove('active');
+                demoText.textContent = 'Demo: employee/emp123';
+            }
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value.trim();
+            
+            if (!username || !password) {
+                alert('कृपया username और password दोनों भरें!');
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.password === password && u.role === selectedRole);
+            
+            if (user) {
+                currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                document.getElementById('loginUser').value = '';
+                document.getElementById('loginPass').value = '';
+                
+                showDashboard();
+            } else {
+                alert(`गलत credentials! या आप ${selectedRole} नहीं हैं।`);
+            }
+        }
+
+        function showRegister() {
+            document.getElementById('registerModal').classList.add('show');
+        }
+
+        function hideRegister() {
+            document.getElementById('registerModal').classList.remove('show');
+        }
+
+        function showForgotPassword() {
+            document.getElementById('forgotModal').classList.add('show');
+        }
+
+        function hideForgotPassword() {
+            document.getElementById('forgotModal').classList.remove('show');
+        }
+
+        function handleForgotPassword() {
+            const username = document.getElementById('forgotUser').value.trim();
+            const newPass = document.getElementById('forgotNewPass').value.trim();
+            const confirmPass = document.getElementById('forgotConfirmPass').value.trim();
+
+            if (!username || !newPass || !confirmPass) {
+                alert('कृपया सभी fields भरें!');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                alert('Passwords match नहीं हो रहे!');
+                return;
+            }
+
+            const userIndex = users.findIndex(u => u.username === username);
+            
+            if (userIndex === -1) {
+                alert('User नहीं मिला!');
+                return;
+            }
+
+            users[userIndex].password = newPass;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            alert('✅ Password successfully reset!');
+            
+            // Clear form
+            document.getElementById('forgotUser').value = '';
+            document.getElementById('forgotNewPass').value = '';
+            document.getElementById('forgotConfirmPass').value = '';
+            
+            hideForgotPassword();
+        }
+
         // Allow Enter key to send message
         document.addEventListener('DOMContentLoaded', function() {
+            // Setup role buttons
+            const adminBtn = document.getElementById('adminRoleBtn');
+            const employeeBtn = document.getElementById('employeeRoleBtn');
+            
+            if (adminBtn) {
+                adminBtn.addEventListener('click', function() {
+                    selectRole('admin');
+                });
+            }
+            
+            if (employeeBtn) {
+                employeeBtn.addEventListener('click', function() {
+                    selectRole('employee');
+                });
+            }
+            
+            // Setup login button
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', handleLogin);
+            }
+            
+            // Setup register link
+            const registerLink = document.getElementById('registerLink');
+            if (registerLink) {
+                registerLink.addEventListener('click', showRegister);
+            }
+            
+            // Setup forgot password link
+            const forgotLink = document.getElementById('forgotLink');
+            if (forgotLink) {
+                forgotLink.addEventListener('click', showForgotPassword);
+            }
+            
+            // Setup register button
+            const registerBtn = document.getElementById('registerBtn');
+            if (registerBtn) {
+                registerBtn.addEventListener('click', handleRegister);
+            }
+            
+            // Setup back from register
+            const backFromRegister = document.getElementById('backFromRegister');
+            if (backFromRegister) {
+                backFromRegister.addEventListener('click', hideRegister);
+            }
+            
+            // Setup reset password button
+            const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+            if (resetPasswordBtn) {
+                resetPasswordBtn.addEventListener('click', handleForgotPassword);
+            }
+            
+            // Setup back from forgot
+            const backFromForgot = document.getElementById('backFromForgot');
+            if (backFromForgot) {
+                backFromForgot.addEventListener('click', hideForgotPassword);
+            }
+            
+            // AI input enter key
             const aiInput = document.getElementById('aiInput');
             if (aiInput) {
                 aiInput.addEventListener('keypress', function(e) {
