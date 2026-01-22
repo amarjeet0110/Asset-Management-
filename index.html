@@ -861,19 +861,35 @@
         <div class="login-container">
             <div class="register-section">
                 <h2 class="section-title">🔑 Reset Password</h2>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="forgotUser" placeholder="Enter your username">
+                
+                <!-- Step 1: Request OTP -->
+                <div id="otpRequestSection">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="forgotUser" placeholder="Enter your username">
+                    </div>
+                    <button class="btn" id="sendOtpBtn">Send OTP</button>
                 </div>
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="forgotNewPass" placeholder="Enter new password">
+                
+                <!-- Step 2: Verify OTP and Reset Password -->
+                <div id="otpVerifySection" style="display: none;">
+                    <div class="form-group">
+                        <label>Enter OTP</label>
+                        <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6">
+                        <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #10b981;" id="otpSentMsg"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="forgotNewPass" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="forgotConfirmPass" placeholder="Confirm new password">
+                    </div>
+                    <button class="btn" id="resetPasswordBtn">Reset Password</button>
+                    <button class="btn" id="resendOtpBtn" style="margin-top: 0.5rem; background: #64748b;">Resend OTP</button>
                 </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" id="forgotConfirmPass" placeholder="Confirm new password">
-                </div>
-                <button class="btn" id="resetPasswordBtn">Reset Password</button>
+                
                 <div class="back-link">
                     <a class="login-link" id="backFromForgot">← Back to Login</a>
                 </div>
@@ -1385,45 +1401,93 @@
             document.getElementById('registerModal').classList.remove('show');
         }
 
+        let generatedOTP = null;
+        let otpUsername = null;
+
         function showForgotPassword() {
+            // Reset form
+            document.getElementById('otpRequestSection').style.display = 'block';
+            document.getElementById('otpVerifySection').style.display = 'none';
+            document.getElementById('forgotUser').value = '';
+            document.getElementById('otpInput').value = '';
+            document.getElementById('forgotNewPass').value = '';
+            document.getElementById('forgotConfirmPass').value = '';
+            generatedOTP = null;
+            otpUsername = null;
+            
             document.getElementById('forgotModal').classList.add('show');
         }
 
         function hideForgotPassword() {
             document.getElementById('forgotModal').classList.remove('show');
+            // Reset form
+            document.getElementById('otpRequestSection').style.display = 'block';
+            document.getElementById('otpVerifySection').style.display = 'none';
+            generatedOTP = null;
+            otpUsername = null;
+        }
+
+        function sendOTP() {
+            const username = document.getElementById('forgotUser').value.trim();
+            
+            if (!username) {
+                alert('कृपया username भरें!');
+                return;
+            }
+
+            const user = users.find(u => u.username === username);
+            
+            if (!user) {
+                alert('यह username registered नहीं है!');
+                return;
+            }
+
+            // Generate 6-digit OTP
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            otpUsername = username;
+            
+            // Show OTP in alert (in real app, this would be sent via email/SMS)
+            alert(`✅ OTP sent successfully!\n\nYour OTP is: ${generatedOTP}\n\n(In production, this would be sent to your email/phone)`);
+            
+            // Show OTP verification section
+            document.getElementById('otpRequestSection').style.display = 'none';
+            document.getElementById('otpVerifySection').style.display = 'block';
+            document.getElementById('otpSentMsg').textContent = `OTP sent to ${username}'s registered contact`;
+            
+            console.log('Generated OTP:', generatedOTP); // For testing
         }
 
         function handleForgotPassword() {
-            const username = document.getElementById('forgotUser').value.trim();
+            const enteredOTP = document.getElementById('otpInput').value.trim();
             const newPass = document.getElementById('forgotNewPass').value.trim();
             const confirmPass = document.getElementById('forgotConfirmPass').value.trim();
 
-            if (!username || !newPass || !confirmPass) {
+            if (!enteredOTP || !newPass || !confirmPass) {
                 alert('कृपया सभी fields भरें!');
                 return;
             }
 
+            if (enteredOTP !== generatedOTP) {
+                alert('❌ गलत OTP! कृपया सही OTP enter करें।');
+                return;
+            }
+
             if (newPass !== confirmPass) {
-                alert('Passwords match नहीं हो रहे!');
+                alert('❌ Passwords match नहीं हो रहे!');
                 return;
             }
 
-            const userIndex = users.findIndex(u => u.username === username);
-            
-            if (userIndex === -1) {
-                alert('User नहीं मिला!');
+            if (newPass.length < 6) {
+                alert('Password कम से कम 6 characters का होना चाहिए!');
                 return;
             }
 
+            // Update password
+            const userIndex = users.findIndex(u => u.username === otpUsername);
             users[userIndex].password = newPass;
             localStorage.setItem('users', JSON.stringify(users));
             
-            alert('✅ Password successfully reset!');
-            
-            // Clear form
-            document.getElementById('forgotUser').value = '';
-            document.getElementById('forgotNewPass').value = '';
-            document.getElementById('forgotConfirmPass').value = '';
+            alert('✅ Password successfully reset! अब आप नए password से login कर सकते हैं।');
             
             hideForgotPassword();
         }
@@ -1474,6 +1538,18 @@
             const backFromRegister = document.getElementById('backFromRegister');
             if (backFromRegister) {
                 backFromRegister.addEventListener('click', hideRegister);
+            }
+            
+            // Setup send OTP button
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            if (sendOtpBtn) {
+                sendOtpBtn.addEventListener('click', sendOTP);
+            }
+            
+            // Setup resend OTP button
+            const resendOtpBtn = document.getElementById('resendOtpBtn');
+            if (resendOtpBtn) {
+                resendOtpBtn.addEventListener('click', sendOTP);
             }
             
             // Setup reset password button
