@@ -799,21 +799,32 @@
         let assets = [];
         let editId = null;
         
-        // Initialize users in localStorage if not exists
-        let users = JSON.parse(localStorage.getItem('users')) || [
+        // Initialize users
+        let users = [
             {id: 1, username: 'admin', password: 'admin123', name: 'Admin User', role: 'admin'},
             {id: 2, username: 'employee', password: 'emp123', name: 'Employee User', role: 'employee'}
         ];
 
         function init() {
+            // Load users
+            const savedUsers = localStorage.getItem('users');
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            } else {
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
             // Check if user is already logged in
-            const savedUser = localStorage.getItem('currentUser');
+            const savedUser = sessionStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 showDashboard();
             }
             loadAssets();
         }
+        
+        // Initialize on page load
+        window.onload = init;
 
         function switchTab(tab) {
             const loginForm = document.getElementById('loginForm');
@@ -846,7 +857,12 @@
             
             if (user) {
                 currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(user));
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Clear login fields
+                document.getElementById('loginUser').value = '';
+                document.getElementById('loginPass').value = '';
+                
                 showDashboard();
             } else {
                 alert('गलत username या password! कृपया फिर से कोशिश करें।');
@@ -908,14 +924,32 @@
 
         function handleLogout() {
             if (confirm('क्या आप logout करना चाहते हैं?')) {
-                localStorage.removeItem('currentUser');
+                sessionStorage.removeItem('currentUser');
                 currentUser = null;
-                document.getElementById('loginPage').classList.remove('hidden');
-                document.getElementById('dashboard').classList.remove('active');
                 
-                // Clear login fields
+                // Clear all form fields
                 document.getElementById('loginUser').value = '';
                 document.getElementById('loginPass').value = '';
+                document.getElementById('assetName').value = '';
+                document.getElementById('assetType').value = '';
+                document.getElementById('assetValue').value = '';
+                document.getElementById('assetStatus').value = 'Active';
+                document.getElementById('assetLocation').value = '';
+                document.getElementById('assetDesc').value = '';
+                document.getElementById('searchBox').value = '';
+                
+                // Reset edit mode
+                editId = null;
+                document.getElementById('formTitle').textContent = 'Add Asset';
+                document.getElementById('saveBtn').textContent = 'Add Asset';
+                document.getElementById('cancelBtn').style.display = 'none';
+                
+                // Hide dashboard and show login
+                document.getElementById('dashboard').classList.remove('active');
+                document.getElementById('loginPage').classList.remove('hidden');
+                
+                // Switch to login tab
+                switchTab('login');
             }
         }
 
@@ -931,4 +965,249 @@
 
             const name = document.getElementById('assetName').value.trim();
             const type = document.getElementById('assetType').value;
-            const value =
+            const value = document.getElementById('assetValue').value || '0';
+            const status = document.getElementById('assetStatus').value;
+            const location = document.getElementById('assetLocation').value.trim();
+            const description = document.getElementById('assetDesc').value.trim();
+
+            if (!name || !type || !status) {
+                alert('कृपया सभी required fields भरें (Name, Type, Status)');
+                return;
+            }
+
+            const asset = {
+                id: editId || Date.now(),
+                name: name,
+                type: type,
+                value: parseFloat(value),
+                status: status,
+                location: location,
+                description: description,
+                createdBy: currentUser.name,
+                createdAt: editId ? assets.find(a => a.id === editId).createdAt : new Date().toISOString()
+            };
+
+            if (editId) {
+                const index = assets.findIndex(a => a.id === editId);
+                assets[index] = asset;
+                editId = null;
+                document.getElementById('formTitle').textContent = 'Add Asset';
+                document.getElementById('saveBtn').textContent = 'Add Asset';
+                document.getElementById('cancelBtn').style.display = 'none';
+            } else {
+                assets.push(asset);
+            }
+
+            localStorage.setItem('assets', JSON.stringify(assets));
+            
+            // Clear form
+            document.getElementById('assetName').value = '';
+            document.getElementById('assetType').value = '';
+            document.getElementById('assetValue').value = '';
+            document.getElementById('assetStatus').value = 'Active';
+            document.getElementById('assetLocation').value = '';
+            document.getElementById('assetDesc').value = '';
+            
+            loadAssets();
+            alert('Asset successfully saved!');
+        }
+
+        function cancelEdit() {
+            editId = null;
+            document.getElementById('formTitle').textContent = 'Add Asset';
+            document.getElementById('saveBtn').textContent = 'Add Asset';
+            document.getElementById('cancelBtn').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('assetName').value = '';
+            document.getElementById('assetType').value = '';
+            document.getElementById('assetValue').value = '';
+            document.getElementById('assetStatus').value = 'Active';
+            document.getElementById('assetLocation').value = '';
+            document.getElementById('assetDesc').value = '';
+        }
+
+        function loadAssets() {
+            const savedAssets = localStorage.getItem('assets');
+            if (savedAssets) {
+                assets = JSON.parse(savedAssets);
+            }
+
+            const searchTerm = document.getElementById('searchBox')?.value.toLowerCase() || '';
+            const filteredAssets = assets.filter(a => 
+                a.name.toLowerCase().includes(searchTerm) ||
+                a.type.toLowerCase().includes(searchTerm) ||
+                a.location.toLowerCase().includes(searchTerm)
+            );
+
+            // Update stats
+            document.getElementById('totalAssets').textContent = assets.length;
+            document.getElementById('activeAssets').textContent = assets.filter(a => a.status === 'Active').length;
+            document.getElementById('totalValue').textContent = '₹' + assets.reduce((sum, a) => sum + (a.value || 0), 0).toLocaleString();
+
+            const listContainer = document.getElementById('assetsList');
+            
+            if (filteredAssets.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty">
+                        <h3>No assets found</h3>
+                        <p>${searchTerm ? 'Try a different search term' : 'Add your first asset to get started'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = filteredAssets.map(asset => `
+                <div class="asset-item">
+                    <div class="asset-header">
+                        <div>
+                            <div class="asset-name">${asset.name}</div>
+                            <span class="status status-${asset.status.toLowerCase()}">${asset.status}</span>
+                        </div>
+                        ${currentUser && currentUser.role === 'admin' ? `
+                        <div class="asset-actions">
+                            <button class="btn-sm btn-edit" onclick="editAsset(${asset.id})">Edit</button>
+                            <button class="btn-sm btn-delete" onclick="deleteAsset(${asset.id})">Delete</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="asset-details">
+                        <div><strong>Type:</strong> ${asset.type}</div>
+                        <div><strong>Value:</strong> ₹${asset.value.toLocaleString()}</div>
+                        <div><strong>Location:</strong> ${asset.location || 'N/A'}</div>
+                        <div><strong>Created By:</strong> ${asset.createdBy}</div>
+                        ${asset.description ? `<div style="grid-column: 1 / -1;"><strong>Description:</strong> ${asset.description}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editAsset(id) {
+            if (currentUser.role !== 'admin') {
+                alert('सिर्फ Admin ही assets edit कर सकते हैं!');
+                return;
+            }
+
+            const asset = assets.find(a => a.id === id);
+            if (!asset) return;
+
+            editId = id;
+            document.getElementById('assetName').value = asset.name;
+            document.getElementById('assetType').value = asset.type;
+            document.getElementById('assetValue').value = asset.value;
+            document.getElementById('assetStatus').value = asset.status;
+            document.getElementById('assetLocation').value = asset.location;
+            document.getElementById('assetDesc').value = asset.description;
+
+            document.getElementById('formTitle').textContent = 'Edit Asset';
+            document.getElementById('saveBtn').textContent = 'Update Asset';
+            document.getElementById('cancelBtn').style.display = 'block';
+
+            // Scroll to form
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteAsset(id) {
+            if (currentUser.role !== 'admin') {
+                alert('सिर्फ Admin ही assets delete कर सकते हैं!');
+                return;
+            }
+
+            if (confirm('क्या आप इस asset को delete करना चाहते हैं?')) {
+                assets = assets.filter(a => a.id !== id);
+                localStorage.setItem('assets', JSON.stringify(assets));
+                loadAssets();
+            }
+        }
+
+        function openAI() {
+            document.getElementById('aiModal').classList.add('show');
+        }
+
+        function closeAI() {
+            document.getElementById('aiModal').classList.remove('show');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('aiInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            const chatBox = document.getElementById('chatBox');
+            
+            // Add user message
+            chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(59, 130, 246, 0.2); border-radius: 0.5rem; color: white;"><strong>You:</strong> ${message}</p>`;
+            input.value = '';
+            
+            // Add loading indicator
+            chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; color: white;" id="aiLoading"><strong>AI:</strong> Thinking...</p>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 1000,
+                        messages: [
+                            { 
+                                role: "user", 
+                                content: `You are an AI assistant for an asset management system. Current user: ${currentUser.name} (${currentUser.role}). Total assets: ${assets.length}. User question: ${message}. Please provide helpful, concise answers about asset management.`
+                            }
+                        ],
+                    })
+                });
+
+                const data = await response.json();
+                const aiResponse = data.content[0].text;
+
+                // Remove loading and add response
+                document.getElementById('aiLoading').remove();
+                chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; color: white;"><strong>AI:</strong> ${aiResponse}</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+            } catch (error) {
+                document.getElementById('aiLoading').remove();
+                chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border-radius: 0.5rem; color: white;"><strong>Error:</strong> Could not connect to AI. Please try again.</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        // Allow Enter key to send message
+        document.addEventListener('DOMContentLoaded', function() {
+            const aiInput = document.getElementById('aiInput');
+            if (aiInput) {
+                aiInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            }
+        });
+
+        function init() {
+            // Load users
+            const savedUsers = localStorage.getItem('users');
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            } else {
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            // Check if user is already logged in
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            }
+            loadAssets();
+        }
+        
+        // Initialize on page load
+        window.onload = init;
+    </script>
