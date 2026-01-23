@@ -931,14 +931,159 @@
                 <div class="stat-value" id="totalValue">₹0</div>
             </div>
         </div>
+        <!-- Employee Request Section -->
+<div class="card" id="employeeRequestCard" style="display: none;">
+    <h2>My Asset Requests</h2>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchRequestTab('new')">New Request</button>
+        <button class="tab" onclick="switchRequestTab('my')">My Requests</button>
+        <button class="tab" onclick="switchRequestTab('assigned')">My Assets</button>
+    </div>
+    
+    <!-- New Request Tab -->
+    <div id="newRequestTab">
+        <div class="form-group">
+            <label>Asset Type *</label>
+            <select id="reqAssetType">
+                <option value="">Select Type</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Monitor">Monitor</option>
+                <option value="Keyboard">Keyboard</option>
+                <option value="Mouse">Mouse</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Reason for Request *</label>
+            <textarea id="reqReason" rows="3" placeholder="Why do you need this asset?"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Priority</label>
+            <select id="reqPriority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+        </div>
+        <button class="btn" onclick="submitAssetRequest()">Submit Request</button>
+    </div>
+    
+    <!-- My Requests Tab -->
+    <div id="myRequestsTab" style="display: none;">
+        <div id="myRequestsList">
+            <!-- Requests will load here -->
+        </div>
+    </div>
+    
+    <!-- My Assets Tab -->
+    <div id="myAssetsTab" style="display: none;">
+        <div id="myAssetsList">
+            <!-- Assigned assets will load here -->
+        </div>
+        
+        <h3 style="margin-top: 2rem; color: white;">Return Request</h3>
+        <div class="form-group">
+            <label>Select Asset to Return</label>
+            <select id="returnMyAsset">
+                <option value="">Select Asset</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Return Reason</label>
+            <textarea id="returnMyReason" rows="2" placeholder="Why returning?"></textarea>
+        </div>
+        <button class="btn" onclick="submitReturnRequest()">Submit Return Request</button>
+    </div>
+</div>
 
-        <div class="grid">
-            <div class="card" id="formCard">
-                <h2 id="formTitle">Add Asset</h2>
-                <div class="form-group">
-                    <label>Asset Name *</label>
-                    <input type="text" id="assetName" placeholder="e.g., Dell Laptop">
-                </div>
+        <!-- Approval System (Admin Only) -->
+<div class="card" id="approvalCard" style="display: none;">
+    <h2>Pending Approvals</h2>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchApprovalTab('requests')">Asset Requests <span class="badge" id="requestBadge">0</span></button>
+        <button class="tab" onclick="switchApprovalTab('returns')">Return Requests <span class="badge" id="returnBadge">0</span></button>
+    </div>
+    
+    <div id="requestsApprovalTab">
+        <div id="pendingRequests">
+            <!-- Pending requests will load here -->
+        </div>
+    </div>
+    
+    <div id="returnsApprovalTab" style="display: none;">
+        <div id="pendingReturns">
+            <!-- Pending returns will load here -->
+        </div>
+    </div>
+</div>
+                <!-- Asset Assignment Section (Admin Only) -->
+<div class="card" id="assignmentCard" style="display: none;">
+    <h2>Asset Assignment</h2>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchAssignTab('assign')">Assign Asset</button>
+        <button class="tab" onclick="switchAssignTab('return')">Return Asset</button>
+        <button class="tab" onclick="switchAssignTab('history')">Assignment History</button>
+    </div>
+    
+    <!-- Assign Tab -->
+    <div id="assignTab">
+        <div class="form-group">
+            <label>Select Asset *</label>
+            <select id="assignAsset">
+                <option value="">Select Available Asset</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Assign To Employee *</label>
+            <select id="assignEmployee">
+                <option value="">Select Employee</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Purpose</label>
+            <textarea id="assignPurpose" rows="2" placeholder="Assignment reason..."></textarea>
+        </div>
+        <button class="btn" onclick="assignAsset()">Assign Asset</button>
+    </div>
+    
+    <!-- Return Tab -->
+    <div id="returnTab" style="display: none;">
+        <div class="form-group">
+            <label>Select Assignment *</label>
+            <select id="returnAssignment">
+                <option value="">Select Active Assignment</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Asset Condition *</label>
+            <select id="returnCondition">
+                <option value="Good">Good Condition</option>
+                <option value="Minor Damage">Minor Damage</option>
+                <option value="Major Damage">Major Damage</option>
+                <option value="Lost">Lost</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Return Notes</label>
+            <textarea id="returnNotes" rows="2" placeholder="Any damage or issues..."></textarea>
+        </div>
+        <button class="btn" onclick="returnAsset()">Process Return</button>
+    </div>
+    
+    <!-- History Tab -->
+    <div id="historyTab" style="display: none;">
+        <div class="form-group">
+            <input type="text" id="historySearch" placeholder="Search by asset or employee..." oninput="loadAssignmentHistory()">
+        </div>
+        <div id="assignmentHistory" style="max-height: 400px; overflow-y: auto;">
+            <!-- History items will load here -->
+        </div>
+    </div>
+</div>
                 <div class="form-group">
                     <label>Type *</label>
                     <select id="assetType">
@@ -1596,5 +1741,454 @@
         }
         
         // Initialize on page load
+        // ========== ASSIGNMENT & REQUEST MANAGEMENT FUNCTIONS ==========
+        
+        let assignments = [];
+        let assetRequests = [];
+        let returnRequests = [];
+
+        // Load data from localStorage
+        function loadStoredData() {
+            const savedAssignments = localStorage.getItem('assignments');
+            if (savedAssignments) assignments = JSON.parse(savedAssignments);
+            
+            const savedRequests = localStorage.getItem('assetRequests');
+            if (savedRequests) assetRequests = JSON.parse(savedRequests);
+            
+            const savedReturns = localStorage.getItem('returnRequests');
+            if (savedReturns) returnRequests = JSON.parse(savedReturns);
+        }
+
+        // ADMIN - Load employee list for assignment
+        function loadEmployeeList() {
+            const employeeSelect = document.getElementById('assignEmployee');
+            if (!employeeSelect) return;
+            
+            const employees = users.filter(u => u.role === 'employee');
+            employeeSelect.innerHTML = '<option value="">Select Employee</option>' + 
+                employees.map(e => `<option value="${e.id}">${e.name} (${e.username})</option>`).join('');
+        }
+
+        // ADMIN - Load available assets for assignment
+        function loadAvailableAssets() {
+            const assetSelect = document.getElementById('assignAsset');
+            if (!assetSelect) return;
+            
+            const available = assets.filter(a => 
+                a.status === 'Active' && 
+                !assignments.find(as => as.assetId === a.id && as.status === 'Active')
+            );
+            
+            assetSelect.innerHTML = '<option value="">Select Available Asset</option>' + 
+                available.map(a => `<option value="${a.id}">${a.name} (${a.type})</option>`).join('');
+        }
+
+        // ADMIN - Assign asset to employee
+        function assignAsset() {
+            const assetId = parseInt(document.getElementById('assignAsset').value);
+            const employeeId = parseInt(document.getElementById('assignEmployee').value);
+            const purpose = document.getElementById('assignPurpose').value.trim();
+            
+            if (!assetId || !employeeId) {
+                alert('कृपया asset और employee select करें!');
+                return;
+            }
+            
+            const asset = assets.find(a => a.id === assetId);
+            const employee = users.find(u => u.id === employeeId);
+            
+            const assignment = {
+                id: Date.now(),
+                assetId: assetId,
+                assetName: asset.name,
+                employeeId: employeeId,
+                employeeName: employee.name,
+                purpose: purpose,
+                assignedDate: new Date().toISOString(),
+                status: 'Active',
+                assignedBy: currentUser.name
+            };
+            
+            assignments.push(assignment);
+            
+            // Update asset status
+            asset.status = 'In-Use';
+            
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            localStorage.setItem('assets', JSON.stringify(assets));
+            
+            alert('✅ Asset successfully assigned!');
+            document.getElementById('assignAsset').value = '';
+            document.getElementById('assignEmployee').value = '';
+            document.getElementById('assignPurpose').value = '';
+            
+            loadAvailableAssets();
+            loadActiveAssignments();
+            loadAssets();
+        }
+
+        // ADMIN - Load active assignments for return
+        function loadActiveAssignments() {
+            const returnSelect = document.getElementById('returnAssignment');
+            if (!returnSelect) return;
+            
+            const active = assignments.filter(a => a.status === 'Active');
+            returnSelect.innerHTML = '<option value="">Select Active Assignment</option>' + 
+                active.map(a => `<option value="${a.id}">${a.assetName} - ${a.employeeName}</option>`).join('');
+        }
+
+        // ADMIN - Process asset return
+        function returnAsset() {
+            const assignmentId = parseInt(document.getElementById('returnAssignment').value);
+            const condition = document.getElementById('returnCondition').value;
+            const notes = document.getElementById('returnNotes').value.trim();
+            
+            if (!assignmentId) {
+                alert('कृपया assignment select करें!');
+                return;
+            }
+            
+            const assignment = assignments.find(a => a.id === assignmentId);
+            assignment.status = 'Returned';
+            assignment.returnDate = new Date().toISOString();
+            assignment.returnCondition = condition;
+            assignment.returnNotes = notes;
+            assignment.returnedBy = currentUser.name;
+            
+            // Update asset status based on condition
+            const asset = assets.find(a => a.id === assignment.assetId);
+            if (condition === 'Good') {
+                asset.status = 'Active';
+            } else if (condition === 'Minor Damage' || condition === 'Major Damage') {
+                asset.status = 'Maintenance';
+            } else if (condition === 'Lost') {
+                asset.status = 'Retired';
+            }
+            
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            localStorage.setItem('assets', JSON.stringify(assets));
+            
+            alert('✅ Asset return processed successfully!');
+            document.getElementById('returnAssignment').value = '';
+            document.getElementById('returnCondition').value = 'Good';
+            document.getElementById('returnNotes').value = '';
+            
+            loadActiveAssignments();
+            loadAssets();
+        }
+
+        // ADMIN - Load assignment history
+        function loadAssignmentHistory() {
+            const historyDiv = document.getElementById('assignmentHistory');
+            if (!historyDiv) return;
+            
+            const searchTerm = document.getElementById('historySearch')?.value.toLowerCase() || '';
+            
+            const filtered = assignments.filter(a => 
+                a.assetName.toLowerCase().includes(searchTerm) ||
+                a.employeeName.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filtered.length === 0) {
+                historyDiv.innerHTML = '<div class="empty"><p>No assignment history found</p></div>';
+                return;
+            }
+            
+            historyDiv.innerHTML = filtered.map(a => `
+                <div class="asset-item">
+                    <div class="asset-header">
+                        <div>
+                            <div class="asset-name">${a.assetName}</div>
+                            <span class="status status-${a.status === 'Active' ? 'active' : 'retired'}">${a.status}</span>
+                        </div>
+                    </div>
+                    <div class="asset-details">
+                        <div><strong>Employee:</strong> ${a.employeeName}</div>
+                        <div><strong>Assigned:</strong> ${new Date(a.assignedDate).toLocaleDateString()}</div>
+                        <div><strong>Purpose:</strong> ${a.purpose || 'N/A'}</div>
+                        ${a.status === 'Returned' ? `
+                            <div><strong>Returned:</strong> ${new Date(a.returnDate).toLocaleDateString()}</div>
+                            <div><strong>Condition:</strong> ${a.returnCondition}</div>
+                            ${a.returnNotes ? `<div style="grid-column: 1 / -1;"><strong>Notes:</strong> ${a.returnNotes}</div>` : ''}
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // EMPLOYEE - Submit asset request
+        function submitAssetRequest() {
+            const assetType = document.getElementById('reqAssetType').value;
+            const reason = document.getElementById('reqReason').value.trim();
+            const priority = document.getElementById('reqPriority').value;
+            
+            if (!assetType || !reason) {
+                alert('कृपया सभी fields भरें!');
+                return;
+            }
+            
+            const request = {
+                id: Date.now(),
+                employeeId: currentUser.id,
+                employeeName: currentUser.name,
+                assetType: assetType,
+                reason: reason,
+                priority: priority,
+                status: 'Pending',
+                requestDate: new Date().toISOString()
+            };
+            
+            assetRequests.push(request);
+            localStorage.setItem('assetRequests', JSON.stringify(assetRequests));
+            
+            alert('✅ Request submitted successfully!');
+            document.getElementById('reqAssetType').value = '';
+            document.getElementById('reqReason').value = '';
+            document.getElementById('reqPriority').value = 'Medium';
+            
+            switchRequestTab('my');
+        }
+
+        // EMPLOYEE - Load my requests
+        function loadMyRequests() {
+            const listDiv = document.getElementById('myRequestsList');
+            if (!listDiv) return;
+            
+            const myRequests = assetRequests.filter(r => r.employeeId === currentUser.id);
+            
+            if (myRequests.length === 0) {
+                listDiv.innerHTML = '<div class="empty"><p>No requests yet</p></div>';
+                return;
+            }
+            
+            listDiv.innerHTML = myRequests.map(r => `
+                <div class="asset-item">
+                    <div class="asset-header">
+                        <div>
+                            <div class="asset-name">${r.assetType}</div>
+                            <span class="status status-${r.status === 'Approved' ? 'active' : r.status === 'Rejected' ? 'retired' : 'maintenance'}">${r.status}</span>
+                        </div>
+                    </div>
+                    <div class="asset-details">
+                        <div><strong>Priority:</strong> ${r.priority}</div>
+                        <div><strong>Requested:</strong> ${new Date(r.requestDate).toLocaleDateString()}</div>
+                        <div style="grid-column: 1 / -1;"><strong>Reason:</strong> ${r.reason}</div>
+                        ${r.status !== 'Pending' ? `<div style="grid-column: 1 / -1;"><strong>Approved By:</strong> ${r.approvedBy || 'N/A'}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // EMPLOYEE - Load my assigned assets
+        function loadMyAssets() {
+            const listDiv = document.getElementById('myAssetsList');
+            const returnSelect = document.getElementById('returnMyAsset');
+            if (!listDiv) return;
+            
+            const myAssignments = assignments.filter(a => a.employeeId === currentUser.id && a.status === 'Active');
+            
+            if (myAssignments.length === 0) {
+                listDiv.innerHTML = '<div class="empty"><p>No assets assigned to you</p></div>';
+            } else {
+                listDiv.innerHTML = myAssignments.map(a => `
+                    <div class="asset-item">
+                        <div class="asset-name">${a.assetName}</div>
+                        <div class="asset-details">
+                            <div><strong>Assigned:</strong> ${new Date(a.assignedDate).toLocaleDateString()}</div>
+                            <div><strong>Purpose:</strong> ${a.purpose || 'N/A'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Populate return dropdown
+            if (returnSelect) {
+                returnSelect.innerHTML = '<option value="">Select Asset</option>' + 
+                    myAssignments.map(a => `<option value="${a.id}">${a.assetName}</option>`).join('');
+            }
+        }
+
+        // EMPLOYEE - Submit return request
+        function submitReturnRequest() {
+            const assignmentId = parseInt(document.getElementById('returnMyAsset').value);
+            const reason = document.getElementById('returnMyReason').value.trim();
+            
+            if (!assignmentId) {
+                alert('कृपया asset select करें!');
+                return;
+            }
+            
+            const assignment = assignments.find(a => a.id === assignmentId);
+            
+            const returnReq = {
+                id: Date.now(),
+                assignmentId: assignmentId,
+                assetName: assignment.assetName,
+                employeeId: currentUser.id,
+                employeeName: currentUser.name,
+                reason: reason,
+                status: 'Pending',
+                requestDate: new Date().toISOString()
+            };
+            
+            returnRequests.push(returnReq);
+            localStorage.setItem('returnRequests', JSON.stringify(returnRequests));
+            
+            alert('✅ Return request submitted!');
+            document.getElementById('returnMyAsset').value = '';
+            document.getElementById('returnMyReason').value = '';
+        }
+
+        // ADMIN - Load pending requests
+        function loadPendingRequests() {
+            const listDiv = document.getElementById('pendingRequests');
+            const badge = document.getElementById('requestBadge');
+            if (!listDiv) return;
+            
+            const pending = assetRequests.filter(r => r.status === 'Pending');
+            
+            if (badge) badge.textContent = pending.length;
+            
+            if (pending.length === 0) {
+                listDiv.innerHTML = '<div class="empty"><p>No pending requests</p></div>';
+                return;
+            }
+            
+            listDiv.innerHTML = pending.map(r => `
+                <div class="asset-item">
+                    <div class="asset-header">
+                        <div>
+                            <div class="asset-name">${r.assetType}</div>
+                            <span class="badge badge-employee">${r.priority} Priority</span>
+                        </div>
+                        <div class="asset-actions">
+                            <button class="btn-sm" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;" onclick="approveRequest(${r.id}, 'approve')">Approve</button>
+                            <button class="btn-sm btn-delete" onclick="approveRequest(${r.id}, 'reject')">Reject</button>
+                        </div>
+                    </div>
+                    <div class="asset-details">
+                        <div><strong>Employee:</strong> ${r.employeeName}</div>
+                        <div><strong>Requested:</strong> ${new Date(r.requestDate).toLocaleDateString()}</div>
+                        <div style="grid-column: 1 / -1;"><strong>Reason:</strong> ${r.reason}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ADMIN - Approve/Reject request
+        function approveRequest(id, action) {
+            const request = assetRequests.find(r => r.id === id);
+            request.status = action === 'approve' ? 'Approved' : 'Rejected';
+            request.approvedBy = currentUser.name;
+            request.approvedDate = new Date().toISOString();
+            
+            localStorage.setItem('assetRequests', JSON.stringify(assetRequests));
+            alert(`✅ Request ${action}d successfully!`);
+            loadPendingRequests();
+        }
+
+        // ADMIN - Load pending returns
+        function loadPendingReturns() {
+            const listDiv = document.getElementById('pendingReturns');
+            const badge = document.getElementById('returnBadge');
+            if (!listDiv) return;
+            
+            const pending = returnRequests.filter(r => r.status === 'Pending');
+            
+            if (badge) badge.textContent = pending.length;
+            
+            if (pending.length === 0) {
+                listDiv.innerHTML = '<div class="empty"><p>No pending returns</p></div>';
+                return;
+            }
+            
+            listDiv.innerHTML = pending.map(r => `
+                <div class="asset-item">
+                    <div class="asset-header">
+                        <div>
+                            <div class="asset-name">${r.assetName}</div>
+                        </div>
+                        <div class="asset-actions">
+                            <button class="btn-sm" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;" onclick="approveReturn(${r.id})">Approve Return</button>
+                        </div>
+                    </div>
+                    <div class="asset-details">
+                        <div><strong>Employee:</strong> ${r.employeeName}</div>
+                        <div><strong>Requested:</strong> ${new Date(r.requestDate).toLocaleDateString()}</div>
+                        ${r.reason ? `<div style="grid-column: 1 / -1;"><strong>Reason:</strong> ${r.reason}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ADMIN - Approve return
+        function approveReturn(id) {
+            const returnReq = returnRequests.find(r => r.id === id);
+            const assignment = assignments.find(a => a.id === returnReq.assignmentId);
+            
+            assignment.status = 'Returned';
+            assignment.returnDate = new Date().toISOString();
+            assignment.returnedBy = currentUser.name;
+            
+            const asset = assets.find(a => a.id === assignment.assetId);
+            asset.status = 'Active';
+            
+            returnReq.status = 'Approved';
+            
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            localStorage.setItem('assets', JSON.stringify(assets));
+            localStorage.setItem('returnRequests', JSON.stringify(returnRequests));
+            
+            alert('✅ Return approved successfully!');
+            loadPendingReturns();
+            loadAssets();
+        }
+
+        // Tab switching functions
+        function switchAssignTab(tab) {
+            document.querySelectorAll('#assignmentCard .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('assignTab').style.display = tab === 'assign' ? 'block' : 'none';
+            document.getElementById('returnTab').style.display = tab === 'return' ? 'block' : 'none';
+            document.getElementById('historyTab').style.display = tab === 'history' ? 'block' : 'none';
+            
+            if (tab === 'assign') {
+                loadEmployeeList();
+                loadAvailableAssets();
+            } else if (tab === 'return') {
+                loadActiveAssignments();
+            } else if (tab === 'history') {
+                loadAssignmentHistory();
+            }
+        }
+
+        function switchRequestTab(tab) {
+            document.querySelectorAll('#employeeRequestCard .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('newRequestTab').style.display = tab === 'new' ? 'block' : 'none';
+            document.getElementById('myRequestsTab').style.display = tab === 'my' ? 'block' : 'none';
+            document.getElementById('myAssetsTab').style.display = tab === 'assigned' ? 'block' : 'none';
+            
+            if (tab === 'my') loadMyRequests();
+            if (tab === 'assigned') loadMyAssets();
+        }
+
+        function switchApprovalTab(tab) {
+            document.querySelectorAll('#approvalCard .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('requestsApprovalTab').style.display = tab === 'requests' ? 'block' : 'none';
+            document.getElementById('returnsApprovalTab').style.display = tab === 'returns' ? 'block' : 'none';
+            
+            if (tab === 'requests') loadPendingRequests();
+            if (tab === 'returns') loadPendingReturns();
+        }
+
+        // ========== END OF NEW FUNCTIONS ==========
+
+        // Initialize on page load
+        window.onload = init;
         window.onload = init;
     </script>
