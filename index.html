@@ -931,94 +931,14 @@
                 <div class="stat-value" id="totalValue">₹0</div>
             </div>
         </div>
-        <!-- Employee Request Section -->
-<div class="card" id="employeeRequestCard" style="display: none;">
-    <h2>My Asset Requests</h2>
-    
-    <div class="tabs">
-        <button class="tab active" onclick="switchRequestTab('new')">New Request</button>
-        <button class="tab" onclick="switchRequestTab('my')">My Requests</button>
-        <button class="tab" onclick="switchRequestTab('assigned')">My Assets</button>
-    </div>
-    
-    <!-- New Request Tab -->
-    <div id="newRequestTab">
-        <div class="form-group">
-            <label>Asset Type *</label>
-            <select id="reqAssetType">
-                <option value="">Select Type</option>
-                <option value="Laptop">Laptop</option>
-                <option value="Mobile">Mobile</option>
-                <option value="Monitor">Monitor</option>
-                <option value="Keyboard">Keyboard</option>
-                <option value="Mouse">Mouse</option>
-                <option value="Other">Other</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Reason for Request *</label>
-            <textarea id="reqReason" rows="3" placeholder="Why do you need this asset?"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Priority</label>
-            <select id="reqPriority">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-            </select>
-        </div>
-        <button class="btn" onclick="submitAssetRequest()">Submit Request</button>
-    </div>
-    
-    <!-- My Requests Tab -->
-    <div id="myRequestsTab" style="display: none;">
-        <div id="myRequestsList">
-            <!-- Requests will load here -->
-        </div>
-    </div>
-    
-    <!-- My Assets Tab -->
-    <div id="myAssetsTab" style="display: none;">
-        <div id="myAssetsList">
-            <!-- Assigned assets will load here -->
-        </div>
-        
-        <h3 style="margin-top: 2rem; color: white;">Return Request</h3>
-        <div class="form-group">
-            <label>Select Asset to Return</label>
-            <select id="returnMyAsset">
-                <option value="">Select Asset</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Return Reason</label>
-            <textarea id="returnMyReason" rows="2" placeholder="Why returning?"></textarea>
-        </div>
-        <button class="btn" onclick="submitReturnRequest()">Submit Return Request</button>
-    </div>
-</div>
 
-        <!-- Approval System (Admin Only) -->
-<div class="card" id="approvalCard" style="display: none;">
-    <h2>Pending Approvals</h2>
-    
-    <div class="tabs">
-        <button class="tab active" onclick="switchApprovalTab('requests')">Asset Requests <span class="badge" id="requestBadge">0</span></button>
-        <button class="tab" onclick="switchApprovalTab('returns')">Return Requests <span class="badge" id="returnBadge">0</span></button>
-    </div>
-    
-    <div id="requestsApprovalTab">
-        <div id="pendingRequests">
-            <!-- Pending requests will load here -->
-        </div>
-    </div>
-    
-    <div id="returnsApprovalTab" style="display: none;">
-        <div id="pendingReturns">
-            <!-- Pending returns will load here -->
-        </div>
-    </div>
-</div>
+        <div class="grid">
+            <div class="card" id="formCard">
+                <h2 id="formTitle">Add Asset</h2>
+                <div class="form-group">
+                    <label>Asset Name *</label>
+                    <input type="text" id="assetName" placeholder="e.g., Dell Laptop">
+                </div>
                 <!-- Asset Assignment Section (Admin Only) -->
 <div class="card" id="assignmentCard" style="display: none;">
     <h2>Asset Assignment</h2>
@@ -1081,6 +1001,27 @@
         </div>
         <div id="assignmentHistory" style="max-height: 400px; overflow-y: auto;">
             <!-- History items will load here -->
+        </div>
+    </div>
+</div>
+                <!-- Approval System (Admin Only) -->
+<div class="card" id="approvalCard" style="display: none;">
+    <h2>Pending Approvals</h2>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchApprovalTab('requests')">Asset Requests <span class="badge" id="requestBadge">0</span></button>
+        <button class="tab" onclick="switchApprovalTab('returns')">Return Requests <span class="badge" id="returnBadge">0</span></button>
+    </div>
+    
+    <div id="requestsApprovalTab">
+        <div id="pendingRequests">
+            <!-- Pending requests will load here -->
+        </div>
+    </div>
+    
+    <div id="returnsApprovalTab" style="display: none;">
+        <div id="pendingReturns">
+            <!-- Pending returns will load here -->
         </div>
     </div>
 </div>
@@ -1739,9 +1680,7 @@
             }
             loadAssets();
         }
-        
-        // Initialize on page load
-      // Assignment Management
+        // Assignment Management
 let assignments = [];
 let assetRequests = [];
 let returnRequests = [];
@@ -1884,5 +1823,6 @@ function showDashboard() {
     const savedRequests = localStorage.getItem('assetRequests');
     if (savedRequests) assetRequests = JSON.parse(savedRequests);
 }
+        // Initialize on page load
         window.onload = init;
     </script>
