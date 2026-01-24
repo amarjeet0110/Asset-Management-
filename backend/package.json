@@ -4,14 +4,56 @@
   "description": "Asset Management Backend",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "parse-server": "^6.3.0",
     "parse-dashboard": "^5.2.0"
   },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
   "engines": {
     "node": ">=18.0.0"
   }
 }
+```
+
+---
+
+### **Step 4: `.gitignore` Banao**
+```
+node_modules/
+npm-debug.log
+.env
+.DS_Store
+```
+
+---
+
+## 📁 Final Backend Repository Structure:
+```
+📁 asset-management-backend/
+├── 📄 Dockerfile           ✅
+├── 📄 package.json         ✅
+├── 📄 index.js             ✅ (YEH ADD KARO!)
+├── 📄 .dockerignore
+├── 📄 .gitignore
+├── 📁 cloud/
+│   └── 📄 main.js          ✅ (YEH BHI ADD KARO!)
+```
+
+---
+
+## 🚀 Environment Variables (Back4app mein set karo):
+
+Back4app Dashboard → Your App → Settings → Environment Variables:
+```
+DATABASE_URI = mongodb://localhost:27017/asset-db
+APP_ID = myAssetApp
+MASTER_KEY = mySecretMasterKey123
+SERVER_URL = https://your-app.back4app.io/parse
+JAVASCRIPT_KEY = myJsKey123
+PORT = 1337
