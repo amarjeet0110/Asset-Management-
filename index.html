@@ -271,6 +271,14 @@
         .form-group select option {
             background: #1e293b;
             color: white;
+            padding: 0.5rem;
+        }
+
+        .form-group select optgroup {
+            background: #0f172a;
+            color: #7dd3fc;
+            font-weight: bold;
+            padding: 0.5rem;
         }
 
         body.light-mode .form-group input,
@@ -284,6 +292,14 @@
         body.light-mode .form-group select option {
             background: white;
             color: #0f172a;
+            padding: 0.5rem;
+        }
+
+        body.light-mode .form-group select optgroup {
+            background: #f1f5f9;
+            color: #0284c7;
+            font-weight: bold;
+            padding: 0.5rem;
         }
 
         .form-group input::placeholder,
@@ -995,7 +1011,7 @@
                         <select id="assetType">
                             <option value="">Select Type</option>
                             <option value="Furniture">Furniture</option>
-                            <option value="Electronic Device">Electronic Device</option>
+                            <option value="Electronic Instrument">Electronic Instrument</option>
                             <option value="Hardware">Hardware</option>
                             <option value="Software">Software</option>
                             <option value="Others">Others</option>
@@ -1151,9 +1167,9 @@
             <div class="card">
                 <h2>Request New Asset</h2>
                 <div class="form-group">
-                    <label>Asset Type *</label>
-                    <select id="requestAssetType">
-                        <option value="">Select Type</option>
+                    <label>Select Asset *</label>
+                    <select id="requestAssetSelect">
+                        <option value="">Select Asset</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1177,7 +1193,7 @@
                 <div class="form-group">
                     <label>Select Asset *</label>
                     <select id="returnRequestAsset">
-                        <option value="">Select Asset</option>
+                        <option value="">Select Asset to Return</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1656,10 +1672,15 @@
         }
 
         function populateDropdowns() {
-            // Admin: Assign section - Show ALL available assets
+            // Admin: Assign section - Show ALL added assets (available ones)
             const availableAssets = assets.filter(a => a.status === 'Available');
-            document.getElementById('assignAssetId').innerHTML = '<option value="">Select Asset</option>' +
-                availableAssets.map(a => `<option value="${a.id}">${a.name} (${a.assetId}) - ${a.type}</option>`).join('');
+            
+            // Simple list without grouping (sabhi assets dikhenge)
+            let assetOptions = '<option value="">Select Asset</option>';
+            availableAssets.forEach(a => {
+                assetOptions += `<option value="${a.id}">[${a.type}] ${a.name} (${a.assetId})</option>`;
+            });
+            document.getElementById('assignAssetId').innerHTML = assetOptions;
 
             // Admin: Assign section - Show ALL registered employees
             const employees = users.filter(u => u.role === 'employee');
@@ -1833,13 +1854,66 @@
 
         function approveRequest(id) {
             const request = requests.find(r => r.id === id);
+            
+            if (request.type === 'new') {
+                // New asset request approved - Assign asset to employee
+                const asset = assets.find(a => a.id === request.assetId);
+                const employee = users.find(u => u.id === request.employeeId);
+                
+                if (!asset || !employee) {
+                    alert('❌ Asset ya Employee nahi mila!');
+                    return;
+                }
+                
+                // Create assignment
+                const assignment = {
+                    id: Date.now(),
+                    assetId: asset.id,
+                    assetName: asset.name,
+                    assetAssetId: asset.assetId,
+                    employeeId: employee.id,
+                    employeeName: employee.name,
+                    assignDate: new Date().toISOString().split('T')[0],
+                    notes: 'Assigned via request approval',
+                    returnDate: null,
+                    condition: null
+                };
+                
+                assignments.push(assignment);
+                asset.status = 'In-Use';
+                
+                localStorage.setItem('assignments', JSON.stringify(assignments));
+                localStorage.setItem('assets', JSON.stringify(assets));
+            } else if (request.type === 'return') {
+                // Return request approved - Process return
+                const assignment = assignments.find(a => a.id === request.assignmentId);
+                const asset = assets.find(a => a.id === request.assetId);
+                
+                if (assignment && asset) {
+                    assignment.returnDate = new Date().toISOString().split('T')[0];
+                    assignment.condition = request.damageReport === 'No' ? 'Good' : (request.damageReport === 'Minor' ? 'Fair' : 'Damaged');
+                    assignment.returnNotes = request.returnReason || 'Returned via request';
+                    
+                    if (request.damageReport === 'No') {
+                        asset.status = 'Available';
+                    } else if (request.damageReport === 'Minor') {
+                        asset.status = 'Maintenance';
+                    } else {
+                        asset.status = 'Damaged';
+                    }
+                    
+                    localStorage.setItem('assignments', JSON.stringify(assignments));
+                    localStorage.setItem('assets', JSON.stringify(assets));
+                }
+            }
+            
             request.status = 'Approved';
             request.approvedBy = currentUser.name;
             request.approvedDate = new Date().toISOString();
 
             localStorage.setItem('requests', JSON.stringify(requests));
-            loadRequests();
-            alert('✅ Request approved!');
+            loadAllData();
+            alert('✅ Request approved aur asset ' + (request.type === 'new' ? 'assign' : 'return') + ' ho gaya!');
         }
 
         function rejectRequest(id) {
@@ -1932,6 +2006,9 @@
                     </div>
                 </div>
             `).join('') : '<div class="empty"><p>You have no assigned assets</p></div>';
+            
+            // Refresh return dropdown after loading assets
+            populateEmployeeDropdowns();
         }
 
         function populateEmployeeDropdowns() {
@@ -1939,31 +2016,48 @@
             const myAssets = assignments.filter(a => 
                 a.employeeId === currentUser.id && !a.returnDate
             );
-            document.getElementById('returnRequestAsset').innerHTML = '<option value="">Select Asset</option>' +
-                myAssets.map(a => `<option value="${a.id}">${a.assetName} (${a.assetAssetId})</option>`).join('');
+            
+            const returnSelect = document.getElementById('returnRequestAsset');
+            if (returnSelect) {
+                returnSelect.innerHTML = '<option value="">Select Asset to Return</option>' +
+                    myAssets.map(a => `<option value="${a.id}">${a.assetName} (${a.assetAssetId})</option>`).join('');
+            }
 
-            // Employee: New Request - Show unique asset types from admin's added assets
-            const uniqueTypes = [...new Set(assets.map(a => a.type))];
-            document.getElementById('requestAssetType').innerHTML = '<option value="">Select Type</option>' +
-                uniqueTypes.map(type => `<option value="${type}">${type}</option>`).join('');
+            // Employee: New Request - Show ALL available assets added by admin
+            const availableAssets = assets.filter(a => a.status === 'Available');
+            
+            // Simple list (sabhi assets dikhenge)
+            let assetOptions = '<option value="">Select Asset</option>';
+            availableAssets.forEach(a => {
+                assetOptions += `<option value="${a.id}">[${a.type}] ${a.name} (${a.assetId})</option>`;
+            });
+            
+            const requestSelect = document.getElementById('requestAssetSelect');
+            if (requestSelect) {
+                requestSelect.innerHTML = assetOptions;
+            }
         }
 
         function submitRequest() {
-            const assetType = document.getElementById('requestAssetType').value;
+            const assetId = parseInt(document.getElementById('requestAssetSelect').value);
             const reason = document.getElementById('requestReason').value.trim();
             const priority = document.getElementById('requestPriority').value;
 
-            if (!assetType || !reason) {
-                alert('कृपया asset type और reason दोनों भरें!');
+            if (!assetId || !reason) {
+                alert('कृपया asset और reason दोनों भरें!');
                 return;
             }
+
+            const asset = assets.find(a => a.id === assetId);
 
             const request = {
                 id: Date.now(),
                 type: 'new',
                 employeeId: currentUser.id,
                 employeeName: currentUser.name,
-                assetType: assetType,
+                assetId: asset.id,
+                assetType: asset.type,
+                assetName: asset.name,
                 reason: reason,
                 priority: priority,
                 status: 'Pending',
@@ -1973,7 +2067,7 @@
             requests.push(request);
             localStorage.setItem('requests', JSON.stringify(requests));
 
-            document.getElementById('requestAssetType').value = '';
+            document.getElementById('requestAssetSelect').value = '';
             document.getElementById('requestReason').value = '';
             document.getElementById('requestPriority').value = 'Low';
 
