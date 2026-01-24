@@ -1,0 +1,17 @@
+{
+  "name": "asset-management-backend",
+  "version": "1.0.0",
+  "description": "Asset Management System Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "parse-server": "^6.3.0",
+    "express": "^4.18.2",
+    "parse-dashboard": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=14.x"
+  }
+}
