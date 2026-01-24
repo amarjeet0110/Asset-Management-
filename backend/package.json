@@ -23,7 +23,7 @@
 
 ---
 
-### **Step 4: `.gitignore` Banao**
+## 📄 **2. `.gitignore`**
 ```
 node_modules/
 npm-debug.log
@@ -33,27 +33,11 @@ npm-debug.log
 
 ---
 
-## 📁 Final Backend Repository Structure:
+## 📄 **3. `.dockerignore`**
 ```
-📁 asset-management-backend/
-├── 📄 Dockerfile           ✅
-├── 📄 package.json         ✅
-├── 📄 index.js             ✅ (YEH ADD KARO!)
-├── 📄 .dockerignore
-├── 📄 .gitignore
-├── 📁 cloud/
-│   └── 📄 main.js          ✅ (YEH BHI ADD KARO!)
-```
-
----
-
-## 🚀 Environment Variables (Back4app mein set karo):
-
-Back4app Dashboard → Your App → Settings → Environment Variables:
-```
-DATABASE_URI = mongodb://localhost:27017/asset-db
-APP_ID = myAssetApp
-MASTER_KEY = mySecretMasterKey123
-SERVER_URL = https://your-app.back4app.io/parse
-JAVASCRIPT_KEY = myJsKey123
-PORT = 1337
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
