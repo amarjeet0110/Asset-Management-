@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -192,32 +191,6 @@
             text-decoration: underline;
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-header h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
-        body.light-mode .login-header h1 {
-            color: #0f172a;
-        }
-
-        .login-header p {
-            font-size: 1rem;
-            color: #bae6fd;
-            margin-bottom: 0;
-        }
-
-        body.light-mode .login-header p {
-            color: #64748b;
-        }
-
         .register-section {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
@@ -264,35 +237,6 @@
 
         .modal-overlay.show {
             display: flex;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        body.light-mode .tab {
-            background: rgba(0, 0, 0, 0.05);
-            color: rgba(0, 0, 0, 0.5);
-        }
-
-        .tab.active {
-            background: linear-gradient(to right, #0ea5e9, #2563eb);
-            color: white;
         }
 
         .form-group {
@@ -468,34 +412,47 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
         }
 
-        .header h1 {
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
+        .nav-tab {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            white-space: nowrap;
+        }
+
+        body.light-mode .nav-tab {
+            background: rgba(0, 0, 0, 0.05);
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(to right, #0ea5e9, #2563eb);
             color: white;
         }
 
-        body.light-mode .header h1 {
-            color: #0f172a;
+        .tab-content {
+            display: none;
         }
 
-        .header p {
-            font-size: 1.25rem;
-            color: #bae6fd;
-        }
-
-        body.light-mode .header p {
-            color: #64748b;
+        .tab-content.active {
+            display: block;
         }
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2.5rem;
         }
@@ -521,6 +478,10 @@
             background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
         }
 
+        .stat-card.orange {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        }
+
         .stat-label {
             color: rgba(255, 255, 255, 0.9);
             font-size: 1rem;
@@ -533,18 +494,6 @@
             color: white;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 1024px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
@@ -552,6 +501,7 @@
             padding: 2rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
         }
 
         body.light-mode .card {
@@ -559,7 +509,7 @@
         }
 
         .card h2 {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: bold;
             margin-bottom: 1.5rem;
             color: white;
@@ -569,12 +519,7 @@
             color: #0f172a;
         }
 
-        .assets-list {
-            max-height: 700px;
-            overflow-y: auto;
-        }
-
-        .asset-item {
+        .asset-item, .request-item {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 1rem;
             padding: 1.5rem;
@@ -583,30 +528,32 @@
             transition: all 0.3s;
         }
 
-        body.light-mode .asset-item {
+        body.light-mode .asset-item,
+        body.light-mode .request-item {
             background: rgba(255, 255, 255, 0.6);
         }
 
-        .asset-item:hover {
+        .asset-item:hover,
+        .request-item:hover {
             transform: translateX(5px);
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .asset-header {
+        .item-header {
             display: flex;
             justify-content: space-between;
             align-items: start;
             margin-bottom: 1rem;
         }
 
-        .asset-name {
-            font-size: 1.5rem;
+        .item-name {
+            font-size: 1.25rem;
             font-weight: bold;
             color: white;
             margin-bottom: 0.5rem;
         }
 
-        body.light-mode .asset-name {
+        body.light-mode .item-name {
             color: #0f172a;
         }
 
@@ -618,36 +565,52 @@
             font-weight: 600;
         }
 
-        .status-active {
+        .status-active, .status-available {
             background: rgba(16, 185, 129, 0.2);
             color: #6ee7b7;
         }
 
-        body.light-mode .status-active {
+        body.light-mode .status-active,
+        body.light-mode .status-available {
             color: #059669;
         }
 
-        .status-maintenance {
+        .status-maintenance, .status-in-use, .status-pending {
             background: rgba(245, 158, 11, 0.2);
             color: #fcd34d;
         }
 
-        body.light-mode .status-maintenance {
+        body.light-mode .status-maintenance,
+        body.light-mode .status-in-use,
+        body.light-mode .status-pending {
             color: #d97706;
         }
 
-        .status-retired {
+        .status-retired, .status-damaged, .status-lost, .status-rejected {
             background: rgba(239, 68, 68, 0.2);
             color: #fca5a5;
         }
 
-        body.light-mode .status-retired {
+        body.light-mode .status-retired,
+        body.light-mode .status-damaged,
+        body.light-mode .status-lost,
+        body.light-mode .status-rejected {
             color: #dc2626;
         }
 
-        .asset-actions {
+        .status-approved {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+
+        body.light-mode .status-approved {
+            color: #059669;
+        }
+
+        .item-actions {
             display: flex;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .btn-sm {
@@ -660,33 +623,51 @@
             transition: all 0.3s;
         }
 
-        .btn-edit {
+        .btn-primary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        body.light-mode .btn-primary {
+            color: #2563eb;
+        }
+
+        .btn-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+
+        body.light-mode .btn-success {
+            color: #059669;
+        }
+
+        .btn-warning {
             background: rgba(245, 158, 11, 0.2);
             color: #fcd34d;
         }
 
-        body.light-mode .btn-edit {
+        body.light-mode .btn-warning {
             color: #d97706;
         }
 
-        .btn-delete {
+        .btn-danger {
             background: rgba(239, 68, 68, 0.2);
             color: #fca5a5;
         }
 
-        body.light-mode .btn-delete {
+        body.light-mode .btn-danger {
             color: #dc2626;
         }
 
-        .asset-details {
+        .item-details {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 0.75rem;
             font-size: 0.95rem;
             color: rgba(255, 255, 255, 0.8);
         }
 
-        body.light-mode .asset-details {
+        body.light-mode .item-details {
             color: rgba(0, 0, 0, 0.7);
         }
 
@@ -765,12 +746,31 @@
             color: #dc2626;
         }
 
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .profile-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            margin: 0 auto 1rem;
+        }
+
         @media (max-width: 768px) {
-            .header h1 { font-size: 2rem; }
-            .asset-details { grid-template-columns: 1fr; }
-            .actions { justify-content: center; }
             .role-selector { grid-template-columns: 1fr; }
             .login-card { padding: 2rem; }
+            .item-details { grid-template-columns: 1fr; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .nav-tabs { overflow-x: auto; }
         }
     </style>
 </head>
@@ -784,14 +784,12 @@
     <!-- Login Page -->
     <div class="login-page" id="loginPage">
         <div class="login-container">
-            <!-- Main Login Card -->
             <div class="login-card" id="loginCard">
                 <div class="login-header">
                     <h1>🏢 Asset Manager</h1>
                     <p>Secure Login Portal</p>
                 </div>
 
-                <!-- Role Selection -->
                 <div class="role-selector">
                     <button type="button" class="role-btn active" id="adminRoleBtn">
                         <span>👨‍💼</span> <span>Admin</span>
@@ -801,7 +799,6 @@
                     </button>
                 </div>
 
-                <!-- Login Form -->
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="loginUser" placeholder="Enter username">
@@ -819,7 +816,7 @@
                 </div>
                 
                 <p class="demo-text" id="demoText">
-                    Demo: admin/admin123
+                    Demo: admin/admin123 or employee/emp123
                 </p>
             </div>
         </div>
@@ -843,6 +840,18 @@
                     <input type="text" id="regName" placeholder="Enter full name">
                 </div>
                 <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="regPhone" placeholder="Enter phone">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <input type="text" id="regDept" placeholder="Enter department">
+                </div>
+                <div class="form-group">
                     <label>Role</label>
                     <select id="regRole">
                         <option value="employee">Employee</option>
@@ -863,7 +872,6 @@
             <div class="register-section">
                 <h2 class="section-title">🔑 Reset Password</h2>
                 
-                <!-- Step 1: Request OTP -->
                 <div id="otpRequestSection">
                     <div class="form-group">
                         <label>Username</label>
@@ -872,7 +880,6 @@
                     <button class="btn" id="sendOtpBtn">Send OTP</button>
                 </div>
                 
-                <!-- Step 2: Verify OTP and Reset Password -->
                 <div id="otpVerifySection" style="display: none;">
                     <div class="form-group">
                         <label>Enter OTP</label>
@@ -906,452 +913,383 @@
                 <span class="badge" id="userBadge">User</span>
             </div>
             <div class="actions">
-                <button class="btn-icon" onclick="openAI()">🤖 AI Chat</button>
+                <button class="btn-icon" onclick="showProfile()">👤 Profile</button>
                 <button class="btn-icon" onclick="toggleTheme()">🌓 Theme</button>
                 <button class="btn-icon" onclick="handleLogout()">🚪 Logout</button>
             </div>
         </div>
 
-        <div class="header">
-            <h1>Asset Management</h1>
-            <p>Track and manage your assets efficiently</p>
-        </div>
-
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-label">Total Assets</div>
-                <div class="stat-value" id="totalAssets">0</div>
-            </div>
-            <div class="stat-card emerald">
-                <div class="stat-label">Active Assets</div>
-                <div class="stat-value" id="activeAssets">0</div>
-            </div>
-            <div class="stat-card violet">
-                <div class="stat-label">Total Value</div>
-                <div class="stat-value" id="totalValue">₹0</div>
+        <!-- Admin Navigation -->
+        <div id="adminNav" style="display: none;">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchDashboard('overview')">📊 Overview</button>
+                <button class="nav-tab" onclick="switchDashboard('assets')">📦 Assets</button>
+                <button class="nav-tab" onclick="switchDashboard('assign')">🔄 Assign/Return</button>
+                <button class="nav-tab" onclick="switchDashboard('requests')">📋 Requests</button>
+                <button class="nav-tab" onclick="switchDashboard('reports')">📈 Reports</button>
             </div>
         </div>
 
-        <div class="grid">
-            <div class="card" id="formCard">
-                <h2 id="formTitle">Add Asset</h2>
-                <div class="form-group">
-                    <label>Asset Name *</label>
-                    <input type="text" id="assetName" placeholder="e.g., Dell Laptop">
+        <!-- Employee Navigation -->
+        <div id="employeeNav" style="display: none;">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchDashboard('myAssets')">📦 My Assets</button>
+                <button class="nav-tab" onclick="switchDashboard('newRequest')">➕ New Request</button>
+                <button class="nav-tab" onclick="switchDashboard('myRequests')">📋 My Requests</button>
+            </div>
+        </div>
+
+        <!-- Admin Overview Tab -->
+        <div id="overviewTab" class="tab-content active">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Assets</div>
+                    <div class="stat-value" id="totalAssets">0</div>
                 </div>
-                <div class="form-group">
-                    <label>Type *</label>
-                    <select id="assetType">
-                        <option value="">Select Type</option>
-                        <option value="Hardware">Hardware</option>
-                        <option value="Software">Software</option>
-                        <option value="Furniture">Furniture</option>
-                        <option value="Vehicle">Vehicle</option>
-                        <option value="Equipment">Equipment</option>
-                    </select>
+                <div class="stat-card emerald">
+                    <div class="stat-label">Available Assets</div>
+                    <div class="stat-value" id="availableAssets">0</div>
                 </div>
-                <div class="form-group">
-                    <label>Value (₹)</label>
-                    <input type="number" id="assetValue" placeholder="0">
+                <div class="stat-card orange">
+                    <div class="stat-label">In Use</div>
+                    <div class="stat-value" id="inUseAssets">0</div>
                 </div>
-                <div class="form-group">
-                    <label>Status *</label>
-                    <select id="assetStatus">
-                        <option value="Active">Active</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Retired">Retired</option>
-                    </select>
+                <div class="stat-card violet">
+                    <div class="stat-label">Pending Requests</div>
+                    <div class="stat-value" id="pendingRequests">0</div>
                 </div>
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" id="assetLocation" placeholder="e.g., Office Floor 2">
+            </div>
+
+            <div class="card">
+                <h2>Recent Activities</h2>
+                <div id="recentActivities"></div>
+            </div>
+        </div>
+
+        <!-- Admin Assets Tab -->
+        <div id="assetsTab" class="tab-content">
+            <div class="card">
+                <h2>Add New Asset</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Asset Name *</label>
+                        <input type="text" id="assetName" placeholder="e.g., Dell Laptop">
+                    </div>
+                    <div class="form-group">
+                        <label>Asset ID *</label>
+                        <input type="text" id="assetId" placeholder="e.g., LAP001">
+                    </div>
+                    <div class="form-group">
+                        <label>Type *</label>
+                        <select id="assetType">
+                            <option value="">Select Type</option>
+                            <option value="Laptop">Laptop</option>
+                            <option value="Desktop">Desktop</option>
+                            <option value="Mobile">Mobile</option>
+                            <option value="Tablet">Tablet</option>
+                            <option value="Monitor">Monitor</option>
+                            <option value="Keyboard">Keyboard</option>
+                            <option value="Mouse">Mouse</option>
+                            <option value="Printer">Printer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Value (₹)</label>
+                        <input type="number" id="assetValue" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select id="assetStatus">
+                            <option value="Available">Available</option>
+                            <option value="In-Use">In-Use</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Damaged">Damaged</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="assetLocation" placeholder="e.g., Office Floor 2">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="assetDesc" rows="2" placeholder="Additional details"></textarea>
                 </div>
-                <button class="btn" onclick="saveAsset()" id="saveBtn">Add Asset</button>
-                <button class="btn" onclick="cancelEdit()" id="cancelBtn" style="display:none; margin-top:0.5rem; background:#64748b;">Cancel</button>
+                <button class="btn" onclick="saveAsset()">Add Asset</button>
             </div>
 
             <div class="card">
-                <h2>Assets Inventory</h2>
+                <h2>All Assets</h2>
                 <div class="form-group">
-                    <input type="text" id="searchBox" placeholder="Search assets..." oninput="loadAssets()">
+                    <input type="text" id="searchAssets" placeholder="Search assets..." oninput="loadAssets()">
                 </div>
-                <div class="assets-list" id="assetsList">
-                    <div class="empty">
-                        <h3>No assets found</h3>
-                        <p>Add your first asset to get started</p>
+                <div id="assetsList"></div>
+            </div>
+        </div>
+
+        <!-- Admin Assign/Return Tab -->
+        <div id="assignTab" class="tab-content">
+            <div class="card">
+                <h2>Assign Asset to Employee</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Select Asset *</label>
+                        <select id="assignAssetId">
+                            <option value="">Select Asset</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Employee *</label>
+                        <select id="assignEmployeeId">
+                            <option value="">Select Employee</option>
+                        </select>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Assignment Date</label>
+                    <input type="date" id="assignDate">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="assignNotes" rows="2" placeholder="Any special instructions"></textarea>
+                </div>
+                <button class="btn" onclick="assignAsset()">Assign Asset</button>
+            </div>
+
+            <div class="card">
+                <h2>Return Asset</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Select Assignment *</label>
+                        <select id="returnAssignmentId">
+                            <option value="">Select Assignment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Condition *</label>
+                        <select id="returnCondition">
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Damaged">Damaged</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Return Notes</label>
+                    <textarea id="returnNotes" rows="2" placeholder="Condition details"></textarea>
+                </div>
+                <button class="btn" onclick="returnAsset()">Return Asset</button>
+            </div>
+
+            <div class="card">
+                <h2>Current Assignments</h2>
+                <div id="assignmentsList"></div>
+            </div>
+        </div>
+
+        <!-- Admin Requests Tab -->
+        <div id="requestsTab" class="tab-content">
+            <div class="card">
+                <h2>Pending Requests</h2>
+                <div id="pendingRequestsList"></div>
+            </div>
+
+            <div class="card">
+                <h2>All Requests History</h2>
+                <div id="allRequestsList"></div>
+            </div>
+        </div>
+
+        <!-- Admin Reports Tab -->
+        <div id="reportsTab" class="tab-content">
+            <div class="card">
+                <h2>Asset Allocation Report</h2>
+                <div id="allocationReport"></div>
+            </div>
+
+            <div class="card">
+                <h2>Asset History Log</h2>
+                <div class="form-group">
+                    <select id="historyAssetSelect" onchange="loadAssetHistory()">
+                        <option value="">Select Asset</option>
+                    </select>
+                </div>
+                <div id="assetHistoryLog"></div>
+            </div>
+        </div>
+
+        <!-- Employee My Assets Tab -->
+        <div id="myAssetsTab" class="tab-content active">
+            <div class="card">
+                <h2>My Current Assets</h2>
+                <div id="employeeAssetsList"></div>
+            </div>
+        </div>
+
+        <!-- Employee New Request Tab -->
+        <div id="newRequestTab" class="tab-content">
+            <div class="card">
+                <h2>Request New Asset</h2>
+                <div class="form-group">
+                    <label>Asset Type *</label>
+                    <select id="requestAssetType">
+                        <option value="">Select Type</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="Desktop">Desktop</option>
+                        <option value="Mobile">Mobile</option>
+                        <option value="Tablet">Tablet</option>
+                        <option value="Monitor">Monitor</option>
+                        <option value="Keyboard">Keyboard</option>
+                        <option value="Mouse">Mouse</option>
+                        <option value="Printer">Printer</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reason for Request *</label>
+                    <textarea id="requestReason" rows="3" placeholder="Please explain why you need this asset"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="requestPriority">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Urgent">Urgent</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="submitRequest()">Submit Request</button>
+            </div>
+
+            <div class="card">
+                <h2>Request Asset Return</h2>
+                <div class="form-group">
+                    <label>Select Asset *</label>
+                    <select id="returnRequestAsset">
+                        <option value="">Select Asset</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reason for Return</label>
+                    <textarea id="returnRequestReason" rows="2" placeholder="Optional"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Report any damage?</label>
+                    <select id="returnDamageReport">
+                        <option value="No">No - Asset is in good condition</option>
+                        <option value="Minor">Minor damage</option>
+                        <option value="Major">Major damage</option>
+                    </select>
+                </div>
+                <div class="form-group" id="damageDetailsGroup" style="display: none;">
+                    <label>Damage Details</label>
+                    <textarea id="damageDetails" rows="2" placeholder="Describe the damage"></textarea>
+                </div>
+                <button class="btn" onclick="submitReturnRequest()">Submit Return Request</button>
+            </div>
+        </div>
+
+        <!-- Employee My Requests Tab -->
+        <div id="myRequestsTab" class="tab-content">
+            <div class="card">
+                <h2>My Request History</h2>
+                <div id="employeeRequestsList"></div>
             </div>
         </div>
     </div>
 
-    <!-- AI Modal -->
-    <div class="modal" id="aiModal">
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>🤖 AI Assistant</h2>
-                <button class="btn-close" onclick="closeAI()">Close</button>
+                <h2>👤 My Profile</h2>
+                <button class="btn-close" onclick="closeProfile()">Close</button>
             </div>
-            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; max-height: 400px; overflow-y: auto;" id="chatBox">
-                <p style="opacity: 0.7; color: white;">Hello! Ask me anything about asset management.</p>
+            <div class="profile-photo" id="profilePhoto">👤</div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="profileName">
             </div>
-            <div class="form-group" style="margin-bottom: 0.5rem;">
-                <textarea id="aiInput" rows="3" placeholder="Type your question..."></textarea>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="profileEmail">
             </div>
-            <button class="btn" onclick="sendMessage()">Send</button>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="profilePhone">
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" id="profileDept">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <input type="text" id="profileRole" disabled>
+            </div>
+            <button class="btn" onclick="updateProfile()">Update Profile</button>
         </div>
     </div>
 
     <script>
         let currentUser = null;
         let assets = [];
-        let editId = null;
-        
-        // Initialize users
-        let users = [
-            {id: 1, username: 'admin', password: 'admin123', name: 'Admin User', role: 'admin'},
-            {id: 2, username: 'employee', password: 'emp123', name: 'Employee User', role: 'employee'}
-        ];
+        let users = [];
+        let assignments = [];
+        let requests = [];
+        let selectedRole = 'admin';
+        let generatedOTP = null;
+        let otpUsername = null;
 
+        // Initialize
         function init() {
-            // Load users
             const savedUsers = localStorage.getItem('users');
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
             } else {
+                users = [
+                    {id: 1, username: 'admin', password: 'admin123', name: 'Admin User', role: 'admin', email: 'admin@company.com', phone: '1234567890', dept: 'IT'},
+                    {id: 2, username: 'employee', password: 'emp123', name: 'Employee User', role: 'employee', email: 'emp@company.com', phone: '0987654321', dept: 'Sales'}
+                ];
                 localStorage.setItem('users', JSON.stringify(users));
             }
-            
-            // Check if user is already logged in
+
+            const savedAssets = localStorage.getItem('assets');
+            if (savedAssets) assets = JSON.parse(savedAssets);
+
+            const savedAssignments = localStorage.getItem('assignments');
+            if (savedAssignments) assignments = JSON.parse(savedAssignments);
+
+            const savedRequests = localStorage.getItem('requests');
+            if (savedRequests) requests = JSON.parse(savedRequests);
+
             const savedUser = sessionStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 showDashboard();
             }
-            loadAssets();
-        }
-        
-        // Initialize on page load
-        window.onload = init;
 
-        function switchTab(tab) {
-            // Not needed anymore - keeping for compatibility
+            setupEventListeners();
         }
 
-
-
-        function handleRegister() {
-            const username = document.getElementById('regUser').value.trim();
-            const password = document.getElementById('regPass').value.trim();
-            const name = document.getElementById('regName').value.trim();
-            const role = document.getElementById('regRole').value;
-
-            if (!username || !password || !name) {
-                alert('कृपया सभी fields भरें!');
-                return;
-            }
-
-            if (users.find(u => u.username === username)) {
-                alert('यह username पहले से मौजूद है! कृपया दूसरा username चुनें।');
-                return;
-            }
-
-            const newUser = {
-                id: Date.now(),
-                username: username,
-                password: password,
-                name: name,
-                role: role
-            };
-
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            alert('✅ Registration सफल! अब आप अपने role के अनुसार login कर सकते हैं।');
-            
-            // Clear form
-            document.getElementById('regUser').value = '';
-            document.getElementById('regPass').value = '';
-            document.getElementById('regName').value = '';
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function setupEventListeners() {
+            document.getElementById('adminRoleBtn')?.addEventListener('click', () => selectRole('admin'));
+            document.getElementById('employeeRoleBtn')?.addEventListener('click', () => selectRole('employee'));
+            document.getElementById('loginBtn')?.addEventListener('click', handleLogin);
+            document.getElementById('registerLink')?.addEventListener('click', showRegister);
+            document.getElementById('forgotLink')?.addEventListener('click', showForgotPassword);
+            document.getElementById('registerBtn')?.addEventListener('click', handleRegister);
+            document.getElementById('backFromRegister')?.addEventListener('click', hideRegister);
+            document.getElementById('sendOtpBtn')?.addEventListener('click', sendOTP);
+            document.getElementById('resendOtpBtn')?.addEventListener('click', sendOTP);
+            document.getElementById('resetPasswordBtn')?.addEventListener('click', handleForgotPassword);
+            document.getElementById('backFromForgot')?.addEventListener('click', hideForgotPassword);
+            document.getElementById('returnDamageReport')?.addEventListener('change', function() {
+                const damageGroup = document.getElementById('damageDetailsGroup');
+                damageGroup.style.display = this.value !== 'No' ? 'block' : 'none';
+            });
         }
-
-        function showDashboard() {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('dashboard').classList.add('active');
-            document.getElementById('userName').textContent = 'Welcome, ' + currentUser.name;
-            document.getElementById('userBadge').textContent = currentUser.role.toUpperCase();
-            document.getElementById('userBadge').className = 'badge badge-' + currentUser.role;
-            
-            // Hide form for employees
-            if (currentUser.role === 'employee') {
-                document.getElementById('formCard').style.display = 'none';
-            } else {
-                document.getElementById('formCard').style.display = 'block';
-            }
-            
-            loadAssets();
-        }
-
-        function handleLogout() {
-            // Clear session
-            sessionStorage.clear();
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            
-            // Hide dashboard
-            document.getElementById('dashboard').style.display = 'none';
-            
-            // Show login page
-            const loginPage = document.getElementById('loginPage');
-            loginPage.style.display = 'flex';
-            loginPage.classList.remove('hidden');
-            
-            // Clear all login fields
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            
-            // Reset role to admin
-            selectRole('admin');
-            
-            // Reload page to ensure clean state
-            setTimeout(() => {
-                location.reload();
-            }, 100);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-        }
-
-        function saveAsset() {
-            if (currentUser.role !== 'admin') {
-                alert('सिर्फ Admin ही assets add/edit कर सकते हैं!');
-                return;
-            }
-
-            const name = document.getElementById('assetName').value.trim();
-            const type = document.getElementById('assetType').value;
-            const value = document.getElementById('assetValue').value || '0';
-            const status = document.getElementById('assetStatus').value;
-            const location = document.getElementById('assetLocation').value.trim();
-            const description = document.getElementById('assetDesc').value.trim();
-
-            if (!name || !type || !status) {
-                alert('कृपया सभी required fields भरें (Name, Type, Status)');
-                return;
-            }
-
-            const asset = {
-                id: editId || Date.now(),
-                name: name,
-                type: type,
-                value: parseFloat(value),
-                status: status,
-                location: location,
-                description: description,
-                createdBy: currentUser.name,
-                createdAt: editId ? assets.find(a => a.id === editId).createdAt : new Date().toISOString()
-            };
-
-            if (editId) {
-                const index = assets.findIndex(a => a.id === editId);
-                assets[index] = asset;
-                editId = null;
-                document.getElementById('formTitle').textContent = 'Add Asset';
-                document.getElementById('saveBtn').textContent = 'Add Asset';
-                document.getElementById('cancelBtn').style.display = 'none';
-            } else {
-                assets.push(asset);
-            }
-
-            localStorage.setItem('assets', JSON.stringify(assets));
-            
-            // Clear form
-            document.getElementById('assetName').value = '';
-            document.getElementById('assetType').value = '';
-            document.getElementById('assetValue').value = '';
-            document.getElementById('assetStatus').value = 'Active';
-            document.getElementById('assetLocation').value = '';
-            document.getElementById('assetDesc').value = '';
-            
-            loadAssets();
-            alert('Asset successfully saved!');
-        }
-
-        function cancelEdit() {
-            editId = null;
-            document.getElementById('formTitle').textContent = 'Add Asset';
-            document.getElementById('saveBtn').textContent = 'Add Asset';
-            document.getElementById('cancelBtn').style.display = 'none';
-            
-            // Clear form
-            document.getElementById('assetName').value = '';
-            document.getElementById('assetType').value = '';
-            document.getElementById('assetValue').value = '';
-            document.getElementById('assetStatus').value = 'Active';
-            document.getElementById('assetLocation').value = '';
-            document.getElementById('assetDesc').value = '';
-        }
-
-        function loadAssets() {
-            const savedAssets = localStorage.getItem('assets');
-            if (savedAssets) {
-                assets = JSON.parse(savedAssets);
-            }
-
-            const searchTerm = document.getElementById('searchBox')?.value.toLowerCase() || '';
-            const filteredAssets = assets.filter(a => 
-                a.name.toLowerCase().includes(searchTerm) ||
-                a.type.toLowerCase().includes(searchTerm) ||
-                a.location.toLowerCase().includes(searchTerm)
-            );
-
-            // Update stats
-            document.getElementById('totalAssets').textContent = assets.length;
-            document.getElementById('activeAssets').textContent = assets.filter(a => a.status === 'Active').length;
-            document.getElementById('totalValue').textContent = '₹' + assets.reduce((sum, a) => sum + (a.value || 0), 0).toLocaleString();
-
-            const listContainer = document.getElementById('assetsList');
-            
-            if (filteredAssets.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="empty">
-                        <h3>No assets found</h3>
-                        <p>${searchTerm ? 'Try a different search term' : 'Add your first asset to get started'}</p>
-                    </div>
-                `;
-                return;
-            }
-
-            listContainer.innerHTML = filteredAssets.map(asset => `
-                <div class="asset-item">
-                    <div class="asset-header">
-                        <div>
-                            <div class="asset-name">${asset.name}</div>
-                            <span class="status status-${asset.status.toLowerCase()}">${asset.status}</span>
-                        </div>
-                        ${currentUser && currentUser.role === 'admin' ? `
-                        <div class="asset-actions">
-                            <button class="btn-sm btn-edit" onclick="editAsset(${asset.id})">Edit</button>
-                            <button class="btn-sm btn-delete" onclick="deleteAsset(${asset.id})">Delete</button>
-                        </div>
-                        ` : ''}
-                    </div>
-                    <div class="asset-details">
-                        <div><strong>Type:</strong> ${asset.type}</div>
-                        <div><strong>Value:</strong> ₹${asset.value.toLocaleString()}</div>
-                        <div><strong>Location:</strong> ${asset.location || 'N/A'}</div>
-                        <div><strong>Created By:</strong> ${asset.createdBy}</div>
-                        ${asset.description ? `<div style="grid-column: 1 / -1;"><strong>Description:</strong> ${asset.description}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function editAsset(id) {
-            if (currentUser.role !== 'admin') {
-                alert('सिर्फ Admin ही assets edit कर सकते हैं!');
-                return;
-            }
-
-            const asset = assets.find(a => a.id === id);
-            if (!asset) return;
-
-            editId = id;
-            document.getElementById('assetName').value = asset.name;
-            document.getElementById('assetType').value = asset.type;
-            document.getElementById('assetValue').value = asset.value;
-            document.getElementById('assetStatus').value = asset.status;
-            document.getElementById('assetLocation').value = asset.location;
-            document.getElementById('assetDesc').value = asset.description;
-
-            document.getElementById('formTitle').textContent = 'Edit Asset';
-            document.getElementById('saveBtn').textContent = 'Update Asset';
-            document.getElementById('cancelBtn').style.display = 'block';
-
-            // Scroll to form
-            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function deleteAsset(id) {
-            if (currentUser.role !== 'admin') {
-                alert('सिर्फ Admin ही assets delete कर सकते हैं!');
-                return;
-            }
-
-            if (confirm('क्या आप इस asset को delete करना चाहते हैं?')) {
-                assets = assets.filter(a => a.id !== id);
-                localStorage.setItem('assets', JSON.stringify(assets));
-                loadAssets();
-            }
-        }
-
-        function openAI() {
-            document.getElementById('aiModal').classList.add('show');
-        }
-
-        function closeAI() {
-            document.getElementById('aiModal').classList.remove('show');
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('aiInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-
-            const chatBox = document.getElementById('chatBox');
-            
-            // Add user message
-            chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(59, 130, 246, 0.2); border-radius: 0.5rem; color: white;"><strong>You:</strong> ${message}</p>`;
-            input.value = '';
-            
-            // Add loading indicator
-            chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; color: white;" id="aiLoading"><strong>AI:</strong> Thinking...</p>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const response = await fetch("https://api.anthropic.com/v1/messages", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514",
-                        max_tokens: 1000,
-                        messages: [
-                            { 
-                                role: "user", 
-                                content: `You are an AI assistant for an asset management system. Current user: ${currentUser.name} (${currentUser.role}). Total assets: ${assets.length}. User question: ${message}. Please provide helpful, concise answers about asset management.`
-                            }
-                        ],
-                    })
-                });
-
-                const data = await response.json();
-                const aiResponse = data.content[0].text;
-
-                // Remove loading and add response
-                document.getElementById('aiLoading').remove();
-                chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; color: white;"><strong>AI:</strong> ${aiResponse}</p>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-                
-            } catch (error) {
-                document.getElementById('aiLoading').remove();
-                chatBox.innerHTML += `<p style="margin: 0.5rem 0; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border-radius: 0.5rem; color: white;"><strong>Error:</strong> Could not connect to AI. Please try again.</p>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-
-        // Role selection functions
-        let selectedRole = 'admin';
 
         function selectRole(role) {
             selectedRole = role;
@@ -1384,10 +1322,8 @@
             if (user) {
                 currentUser = user;
                 sessionStorage.setItem('currentUser', JSON.stringify(user));
-                
                 document.getElementById('loginUser').value = '';
                 document.getElementById('loginPass').value = '';
-                
                 showDashboard();
             } else {
                 alert(`गलत credentials! या आप ${selectedRole} नहीं हैं।`);
@@ -1402,11 +1338,45 @@
             document.getElementById('registerModal').classList.remove('show');
         }
 
-        let generatedOTP = null;
-        let otpUsername = null;
+        function handleRegister() {
+            const username = document.getElementById('regUser').value.trim();
+            const password = document.getElementById('regPass').value.trim();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const dept = document.getElementById('regDept').value.trim();
+            const role = document.getElementById('regRole').value;
+
+            if (!username || !password || !name || !email) {
+                alert('कृपया सभी required fields भरें!');
+                return;
+            }
+
+            if (users.find(u => u.username === username)) {
+                alert('यह username पहले से मौजूद है!');
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                username, password, name, email, phone, dept, role
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('✅ Registration सफल!');
+            
+            document.getElementById('regUser').value = '';
+            document.getElementById('regPass').value = '';
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPhone').value = '';
+            document.getElementById('regDept').value = '';
+            
+            hideRegister();
+        }
 
         function showForgotPassword() {
-            // Reset form
             document.getElementById('otpRequestSection').style.display = 'block';
             document.getElementById('otpVerifySection').style.display = 'none';
             document.getElementById('forgotUser').value = '';
@@ -1415,17 +1385,11 @@
             document.getElementById('forgotConfirmPass').value = '';
             generatedOTP = null;
             otpUsername = null;
-            
             document.getElementById('forgotModal').classList.add('show');
         }
 
         function hideForgotPassword() {
             document.getElementById('forgotModal').classList.remove('show');
-            // Reset form
-            document.getElementById('otpRequestSection').style.display = 'block';
-            document.getElementById('otpVerifySection').style.display = 'none';
-            generatedOTP = null;
-            otpUsername = null;
         }
 
         function sendOTP() {
@@ -1443,19 +1407,14 @@
                 return;
             }
 
-            // Generate 6-digit OTP
             generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
             otpUsername = username;
             
-            // Show OTP in alert (in real app, this would be sent via email/SMS)
-            alert(`✅ OTP sent successfully!\n\nYour OTP is: ${generatedOTP}\n\n(In production, this would be sent to your email/phone)`);
+            alert(`✅ OTP sent!\n\nYour OTP: ${generatedOTP}\n\n(In production, sent via email/SMS)`);
             
-            // Show OTP verification section
             document.getElementById('otpRequestSection').style.display = 'none';
             document.getElementById('otpVerifySection').style.display = 'block';
             document.getElementById('otpSentMsg').textContent = `OTP sent to ${username}'s registered contact`;
-            
-            console.log('Generated OTP:', generatedOTP); // For testing
         }
 
         function handleForgotPassword() {
@@ -1469,7 +1428,7 @@
             }
 
             if (enteredOTP !== generatedOTP) {
-                alert('❌ गलत OTP! कृपया सही OTP enter करें।');
+                alert('❌ गलत OTP!');
                 return;
             }
 
@@ -1478,123 +1437,629 @@
                 return;
             }
 
-            if (newPass.length < 6) {
-                alert('Password कम से कम 6 characters का होना चाहिए!');
-                return;
-            }
-
-            // Update password
             const userIndex = users.findIndex(u => u.username === otpUsername);
             users[userIndex].password = newPass;
             localStorage.setItem('users', JSON.stringify(users));
             
-            alert('✅ Password successfully reset! अब आप नए password से login कर सकते हैं।');
-            
+            alert('✅ Password successfully reset!');
             hideForgotPassword();
         }
 
-        // Allow Enter key to send message
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup role buttons
-            const adminBtn = document.getElementById('adminRoleBtn');
-            const employeeBtn = document.getElementById('employeeRoleBtn');
+        function showDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('userName').textContent = 'Welcome, ' + currentUser.name;
+            document.getElementById('userBadge').textContent = currentUser.role.toUpperCase();
+            document.getElementById('userBadge').className = 'badge badge-' + currentUser.role;
             
-            if (adminBtn) {
-                adminBtn.addEventListener('click', function() {
-                    selectRole('admin');
-                });
-            }
-            
-            if (employeeBtn) {
-                employeeBtn.addEventListener('click', function() {
-                    selectRole('employee');
-                });
-            }
-            
-            // Setup login button
-            const loginBtn = document.getElementById('loginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', handleLogin);
-            }
-            
-            // Setup register link
-            const registerLink = document.getElementById('registerLink');
-            if (registerLink) {
-                registerLink.addEventListener('click', showRegister);
-            }
-            
-            // Setup forgot password link
-            const forgotLink = document.getElementById('forgotLink');
-            if (forgotLink) {
-                forgotLink.addEventListener('click', showForgotPassword);
-            }
-            
-            // Setup register button
-            const registerBtn = document.getElementById('registerBtn');
-            if (registerBtn) {
-                registerBtn.addEventListener('click', handleRegister);
-            }
-            
-            // Setup back from register
-            const backFromRegister = document.getElementById('backFromRegister');
-            if (backFromRegister) {
-                backFromRegister.addEventListener('click', hideRegister);
-            }
-            
-            // Setup send OTP button
-            const sendOtpBtn = document.getElementById('sendOtpBtn');
-            if (sendOtpBtn) {
-                sendOtpBtn.addEventListener('click', sendOTP);
-            }
-            
-            // Setup resend OTP button
-            const resendOtpBtn = document.getElementById('resendOtpBtn');
-            if (resendOtpBtn) {
-                resendOtpBtn.addEventListener('click', sendOTP);
-            }
-            
-            // Setup reset password button
-            const resetPasswordBtn = document.getElementById('resetPasswordBtn');
-            if (resetPasswordBtn) {
-                resetPasswordBtn.addEventListener('click', handleForgotPassword);
-            }
-            
-            // Setup back from forgot
-            const backFromForgot = document.getElementById('backFromForgot');
-            if (backFromForgot) {
-                backFromForgot.addEventListener('click', hideForgotPassword);
-            }
-            
-            // AI input enter key
-            const aiInput = document.getElementById('aiInput');
-            if (aiInput) {
-                aiInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-            }
-        });
-
-        function init() {
-            // Load users
-            const savedUsers = localStorage.getItem('users');
-            if (savedUsers) {
-                users = JSON.parse(savedUsers);
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminNav').style.display = 'block';
+                document.getElementById('employeeNav').style.display = 'none';
+                switchDashboard('overview');
             } else {
-                localStorage.setItem('users', JSON.stringify(users));
+                document.getElementById('adminNav').style.display = 'none';
+                document.getElementById('employeeNav').style.display = 'block';
+                switchDashboard('myAssets');
             }
             
-            // Check if user is already logged in
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showDashboard();
-            }
-            loadAssets();
+            loadAllData();
         }
-        
-        // Initialize on page load
+
+        function handleLogout() {
+            sessionStorage.clear();
+            currentUser = null;
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            selectRole('admin');
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+        }
+
+        function switchDashboard(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event?.target?.classList.add('active');
+            document.getElementById(tab + 'Tab')?.classList.add('active');
+            
+            loadAllData();
+        }
+
+        function loadAllData() {
+            if (currentUser.role === 'admin') {
+                loadStats();
+                loadAssets();
+                loadAssignments();
+                loadRequests();
+                loadReports();
+                populateDropdowns();
+            } else {
+                loadEmployeeAssets();
+                loadEmployeeRequests();
+                populateEmployeeDropdowns();
+            }
+        }
+
+        function loadStats() {
+            document.getElementById('totalAssets').textContent = assets.length;
+            document.getElementById('availableAssets').textContent = assets.filter(a => a.status === 'Available').length;
+            document.getElementById('inUseAssets').textContent = assets.filter(a => a.status === 'In-Use').length;
+            document.getElementById('pendingRequests').textContent = requests.filter(r => r.status === 'Pending').length;
+            
+            const activities = [
+                ...assignments.slice(-5).reverse().map(a => ({
+                    type: 'assignment',
+                    text: `Asset ${a.assetName} assigned to ${a.employeeName}`,
+                    date: a.assignDate
+                })),
+                ...requests.slice(-5).reverse().map(r => ({
+                    type: 'request',
+                    text: `${r.employeeName} requested ${r.assetType}`,
+                    date: r.requestDate
+                }))
+            ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+
+            document.getElementById('recentActivities').innerHTML = activities.length ? activities.map(a => `
+                <div class="asset-item">
+                    <div class="item-name">${a.text}</div>
+                    <div style="color: rgba(255,255,255,0.6); font-size: 0.875rem;">${new Date(a.date).toLocaleDateString()}</div>
+                </div>
+            `).join('') : '<div class="empty"><p>No recent activities</p></div>';
+        }
+
+        function saveAsset() {
+            const name = document.getElementById('assetName').value.trim();
+            const assetId = document.getElementById('assetId').value.trim();
+            const type = document.getElementById('assetType').value;
+            const value = document.getElementById('assetValue').value || '0';
+            const status = document.getElementById('assetStatus').value;
+            const location = document.getElementById('assetLocation').value.trim();
+            const description = document.getElementById('assetDesc').value.trim();
+
+            if (!name || !assetId || !type) {
+                alert('कृपया सभी required fields भरें!');
+                return;
+            }
+
+            if (assets.find(a => a.assetId === assetId)) {
+                alert('यह Asset ID पहले से मौजूद है!');
+                return;
+            }
+
+            const asset = {
+                id: Date.now(),
+                assetId, name, type,
+                value: parseFloat(value),
+                status, location, description,
+                createdBy: currentUser.name,
+                createdAt: new Date().toISOString()
+            };
+
+            assets.push(asset);
+            localStorage.setItem('assets', JSON.stringify(assets));
+            
+            document.getElementById('assetName').value = '';
+            document.getElementById('assetId').value = '';
+            document.getElementById('assetType').value = '';
+            document.getElementById('assetValue').value = '';
+            document.getElementById('assetStatus').value = 'Available';
+            document.getElementById('assetLocation').value = '';
+            document.getElementById('assetDesc').value = '';
+            
+            loadAssets();
+            alert('✅ Asset successfully added!');
+        }
+
+        function loadAssets() {
+            const search = document.getElementById('searchAssets')?.value.toLowerCase() || '';
+            const filtered = assets.filter(a => 
+                a.name.toLowerCase().includes(search) ||
+                a.assetId.toLowerCase().includes(search) ||
+                a.type.toLowerCase().includes(search)
+            );
+
+            const list = document.getElementById('assetsList');
+            if (!list) return;
+
+            list.innerHTML = filtered.length ? filtered.map(a => `
+                <div class="asset-item">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-name">${a.name} (${a.assetId})</div>
+                            <span class="status status-${a.status.toLowerCase().replace('-', '')}">${a.status}</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-sm btn-warning" onclick="changeAssetStatus(${a.id})">Change Status</button>
+                            <button class="btn-sm btn-danger" onclick="deleteAsset(${a.id})">Delete</button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <div><strong>Type:</strong> ${a.type}</div>
+                        <div><strong>Value:</strong> ₹${a.value.toLocaleString()}</div>
+                        <div><strong>Location:</strong> ${a.location || 'N/A'}</div>
+                        <div><strong>Created:</strong> ${new Date(a.createdAt).toLocaleDateString()}</div>
+                    </div>
+                </div>
+            `).join('') : '<div class="empty"><p>No assets found</p></div>';
+        }
+
+        function changeAssetStatus(id) {
+            const asset = assets.find(a => a.id === id);
+            const newStatus = prompt(`Current Status: ${asset.status}\n\nEnter new status:\n- Available\n- In-Use\n- Maintenance\n- Damaged\n- Lost`, asset.status);
+            
+            if (newStatus && ['Available', 'In-Use', 'Maintenance', 'Damaged', 'Lost'].includes(newStatus)) {
+                asset.status = newStatus;
+                localStorage.setItem('assets', JSON.stringify(assets));
+                loadAssets();
+                alert('✅ Status updated!');
+            }
+        }
+
+        function deleteAsset(id) {
+            if (confirm('क्या आप इस asset को delete करना चाहते हैं?')) {
+                assets = assets.filter(a => a.id !== id);
+                localStorage.setItem('assets', JSON.stringify(assets));
+                loadAssets();
+            }
+        }
+
+        function populateDropdowns() {
+            const availableAssets = assets.filter(a => a.status === 'Available');
+            const employees = users.filter(u => u.role === 'employee');
+            const activeAssignments = assignments.filter(a => !a.returnDate);
+
+            document.getElementById('assignAssetId').innerHTML = '<option value="">Select Asset</option>' +
+                availableAssets.map(a => `<option value="${a.id}">${a.name} (${a.assetId})</option>`).join('');
+
+            document.getElementById('assignEmployeeId').innerHTML = '<option value="">Select Employee</option>' +
+                employees.map(e => `<option value="${e.id}">${e.name} (${e.dept})</option>`).join('');
+
+            document.getElementById('returnAssignmentId').innerHTML = '<option value="">Select Assignment</option>' +
+                activeAssignments.map(a => `<option value="${a.id}">${a.assetName} → ${a.employeeName}</option>`).join('');
+
+            document.getElementById('historyAssetSelect').innerHTML = '<option value="">Select Asset</option>' +
+                assets.map(a => `<option value="${a.id}">${a.name} (${a.assetId})</option>`).join('');
+        }
+
+        function assignAsset() {
+            const assetId = parseInt(document.getElementById('assignAssetId').value);
+            const employeeId = parseInt(document.getElementById('assignEmployeeId').value);
+            const assignDate = document.getElementById('assignDate').value;
+            const notes = document.getElementById('assignNotes').value.trim();
+
+            if (!assetId || !employeeId) {
+                alert('कृपया asset और employee दोनों select करें!');
+                return;
+            }
+
+            const asset = assets.find(a => a.id === assetId);
+            const employee = users.find(u => u.id === employeeId);
+
+            const assignment = {
+                id: Date.now(),
+                assetId: asset.id,
+                assetName: asset.name,
+                assetAssetId: asset.assetId,
+                employeeId: employee.id,
+                employeeName: employee.name,
+                assignDate: assignDate || new Date().toISOString().split('T')[0],
+                notes: notes,
+                returnDate: null,
+                condition: null
+            };
+
+            assignments.push(assignment);
+            asset.status = 'In-Use';
+            
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            localStorage.setItem('assets', JSON.stringify(assets));
+
+            document.getElementById('assignAssetId').value = '';
+            document.getElementById('assignEmployeeId').value = '';
+            document.getElementById('assignDate').value = '';
+            document.getElementById('assignNotes').value = '';
+
+            loadAllData();
+            alert('✅ Asset successfully assigned!');
+        }
+
+        function returnAsset() {
+            const assignmentId = parseInt(document.getElementById('returnAssignmentId').value);
+            const condition = document.getElementById('returnCondition').value;
+            const notes = document.getElementById('returnNotes').value.trim();
+
+            if (!assignmentId) {
+                alert('कृपया assignment select करें!');
+                return;
+            }
+
+            const assignment = assignments.find(a => a.id === assignmentId);
+            const asset = assets.find(a => a.id === assignment.assetId);
+
+            assignment.returnDate = new Date().toISOString().split('T')[0];
+            assignment.condition = condition;
+            assignment.returnNotes = notes;
+
+            if (condition === 'Good') {
+                asset.status = 'Available';
+            } else if (condition === 'Fair') {
+                asset.status = 'Maintenance';
+            } else {
+                asset.status = 'Damaged';
+            }
+
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            localStorage.setItem('assets', JSON.stringify(assets));
+
+            document.getElementById('returnAssignmentId').value = '';
+            document.getElementById('returnCondition').value = 'Good';
+            document.getElementById('returnNotes').value = '';
+
+            loadAllData();
+            alert('✅ Asset successfully returned!');
+        }
+
+        function loadAssignments() {
+            const activeAssignments = assignments.filter(a => !a.returnDate);
+            const list = document.getElementById('assignmentsList');
+            if (!list) return;
+
+            list.innerHTML = activeAssignments.length ? activeAssignments.map(a => `
+                <div class="request-item">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-name">${a.assetName} (${a.assetAssetId})</div>
+                            <span class="status status-in-use">In-Use</span>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <div><strong>Employee:</strong> ${a.employeeName}</div>
+                        <div><strong>Assigned:</strong> ${new Date(a.assignDate).toLocaleDateString()}</div>
+                        ${a.notes ? `<div style="grid-column: 1 / -1;"><strong>Notes:</strong> ${a.notes}</div>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="empty"><p>No active assignments</p></div>';
+        }
+
+        function loadRequests() {
+            const pending = requests.filter(r => r.status === 'Pending');
+            const all = requests;
+
+            const pendingList = document.getElementById('pendingRequestsList');
+            if (pendingList) {
+                pendingList.innerHTML = pending.length ? pending.map(r => `
+                    <div class="request-item">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-name">${r.type === 'new' ? 'New Asset Request' : 'Return Request'}</div>
+                                <span class="status status-pending">Pending</span>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn-sm btn-success" onclick="approveRequest(${r.id})">✓ Approve</button>
+                                <button class="btn-sm btn-danger" onclick="rejectRequest(${r.id})">✗ Reject</button>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <div><strong>Employee:</strong> ${r.employeeName}</div>
+                            <div><strong>Date:</strong> ${new Date(r.requestDate).toLocaleDateString()}</div>
+                            ${r.type === 'new' ? `
+                                <div><strong>Asset Type:</strong> ${r.assetType}</div>
+                                <div><strong>Priority:</strong> ${r.priority}</div>
+                                <div style="grid-column: 1 / -1;"><strong>Reason:</strong> ${r.reason}</div>
+                            ` : `
+                                <div><strong>Asset:</strong> ${r.assetName}</div>
+                                <div><strong>Damage:</strong> ${r.damageReport}</div>
+                                ${r.damageDetails ? `<div style="grid-column: 1 / -1;"><strong>Details:</strong> ${r.damageDetails}</div>` : ''}
+                            `}
+                        </div>
+                    </div>
+                `).join('') : '<div class="empty"><p>No pending requests</p></div>';
+            }
+
+            const allList = document.getElementById('allRequestsList');
+            if (allList) {
+                allList.innerHTML = all.length ? all.map(r => `
+                    <div class="request-item">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-name">${r.type === 'new' ? 'New Asset Request' : 'Return Request'}</div>
+                                <span class="status status-${r.status.toLowerCase()}">${r.status}</span>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <div><strong>Employee:</strong> ${r.employeeName}</div>
+                            <div><strong>Date:</strong> ${new Date(r.requestDate).toLocaleDateString()}</div>
+                            ${r.type === 'new' ? `<div><strong>Asset Type:</strong> ${r.assetType}</div>` : `<div><strong>Asset:</strong> ${r.assetName}</div>`}
+                            ${r.approvedBy ? `<div><strong>Processed By:</strong> ${r.approvedBy}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('') : '<div class="empty"><p>No requests yet</p></div>';
+            }
+        }
+
+        function approveRequest(id) {
+            const request = requests.find(r => r.id === id);
+            request.status = 'Approved';
+            request.approvedBy = currentUser.name;
+            request.approvedDate = new Date().toISOString();
+
+            localStorage.setItem('requests', JSON.stringify(requests));
+            loadRequests();
+            alert('✅ Request approved!');
+        }
+
+        function rejectRequest(id) {
+            const reason = prompt('Rejection reason (optional):');
+            const request = requests.find(r => r.id === id);
+            request.status = 'Rejected';
+            request.approvedBy = currentUser.name;
+            request.approvedDate = new Date().toISOString();
+            request.rejectionReason = reason;
+
+            localStorage.setItem('requests', JSON.stringify(requests));
+            loadRequests();
+            alert('❌ Request rejected!');
+        }
+
+        function loadReports() {
+            const allocationList = document.getElementById('allocationReport');
+            if (allocationList) {
+                const employeeAssets = {};
+                assignments.filter(a => !a.returnDate).forEach(a => {
+                    if (!employeeAssets[a.employeeName]) {
+                        employeeAssets[a.employeeName] = [];
+                    }
+                    employeeAssets[a.employeeName].push(a.assetName);
+                });
+
+                const report = Object.keys(employeeAssets).map(emp => `
+                    <div class="asset-item">
+                        <div class="item-name">${emp}</div>
+                        <div class="item-details">
+                            <div style="grid-column: 1 / -1;"><strong>Assets:</strong> ${employeeAssets[emp].join(', ')}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                allocationList.innerHTML = report || '<div class="empty"><p>No assets currently assigned</p></div>';
+            }
+        }
+
+        function loadAssetHistory() {
+            const assetId = parseInt(document.getElementById('historyAssetSelect').value);
+            const list = document.getElementById('assetHistoryLog');
+            if (!list) return;
+
+            if (!assetId) {
+                list.innerHTML = '<div class="empty"><p>Select an asset to view history</p></div>';
+                return;
+            }
+
+            const history = assignments.filter(a => a.assetId === assetId);
+            list.innerHTML = history.length ? history.map(h => `
+                <div class="asset-item">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-name">Assignment to ${h.employeeName}</div>
+                            <span class="status ${h.returnDate ? 'status-approved' : 'status-in-use'}">
+                                ${h.returnDate ? 'Returned' : 'In-Use'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <div><strong>Assigned:</strong> ${new Date(h.assignDate).toLocaleDateString()}</div>
+                        ${h.returnDate ? `<div><strong>Returned:</strong> ${new Date(h.returnDate).toLocaleDateString()}</div>` : ''}
+                        ${h.condition ? `<div><strong>Condition:</strong> ${h.condition}</div>` : ''}
+                        ${h.notes ? `<div style="grid-column: 1 / -1;"><strong>Notes:</strong> ${h.notes}</div>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="empty"><p>No history for this asset</p></div>';
+        }
+
+        function loadEmployeeAssets() {
+            const myAssets = assignments.filter(a => 
+                a.employeeId === currentUser.id && !a.returnDate
+            );
+
+            const list = document.getElementById('employeeAssetsList');
+            if (!list) return;
+
+            list.innerHTML = myAssets.length ? myAssets.map(a => `
+                <div class="asset-item">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-name">${a.assetName} (${a.assetAssetId})</div>
+                            <span class="status status-in-use">In-Use</span>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <div><strong>Assigned Date:</strong> ${new Date(a.assignDate).toLocaleDateString()}</div>
+                        ${a.notes ? `<div style="grid-column: 1 / -1;"><strong>Notes:</strong> ${a.notes}</div>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="empty"><p>You have no assigned assets</p></div>';
+        }
+
+        function populateEmployeeDropdowns() {
+            const myAssets = assignments.filter(a => 
+                a.employeeId === currentUser.id && !a.returnDate
+            );
+
+            document.getElementById('returnRequestAsset').innerHTML = '<option value="">Select Asset</option>' +
+                myAssets.map(a => `<option value="${a.id}">${a.assetName} (${a.assetAssetId})</option>`).join('');
+        }
+
+        function submitRequest() {
+            const assetType = document.getElementById('requestAssetType').value;
+            const reason = document.getElementById('requestReason').value.trim();
+            const priority = document.getElementById('requestPriority').value;
+
+            if (!assetType || !reason) {
+                alert('कृपया asset type और reason दोनों भरें!');
+                return;
+            }
+
+            const request = {
+                id: Date.now(),
+                type: 'new',
+                employeeId: currentUser.id,
+                employeeName: currentUser.name,
+                assetType: assetType,
+                reason: reason,
+                priority: priority,
+                status: 'Pending',
+                requestDate: new Date().toISOString()
+            };
+
+            requests.push(request);
+            localStorage.setItem('requests', JSON.stringify(requests));
+
+            document.getElementById('requestAssetType').value = '';
+            document.getElementById('requestReason').value = '';
+            document.getElementById('requestPriority').value = 'Low';
+
+            alert('✅ Request submitted successfully!');
+            loadEmployeeRequests();
+        }
+
+        function submitReturnRequest() {
+            const assignmentId = parseInt(document.getElementById('returnRequestAsset').value);
+            const returnReason = document.getElementById('returnRequestReason').value.trim();
+            const damageReport = document.getElementById('returnDamageReport').value;
+            const damageDetails = document.getElementById('damageDetails').value.trim();
+
+            if (!assignmentId) {
+                alert('कृपया asset select करें!');
+                return;
+            }
+
+            const assignment = assignments.find(a => a.id === assignmentId);
+
+            const request = {
+                id: Date.now(),
+                type: 'return',
+                employeeId: currentUser.id,
+                employeeName: currentUser.name,
+                assetId: assignment.assetId,
+                assetName: assignment.assetName,
+                assignmentId: assignmentId,
+                returnReason: returnReason,
+                damageReport: damageReport,
+                damageDetails: damageDetails,
+                status: 'Pending',
+                requestDate: new Date().toISOString()
+            };
+
+            requests.push(request);
+            localStorage.setItem('requests', JSON.stringify(requests));
+
+            document.getElementById('returnRequestAsset').value = '';
+            document.getElementById('returnRequestReason').value = '';
+            document.getElementById('returnDamageReport').value = 'No';
+            document.getElementById('damageDetails').value = '';
+            document.getElementById('damageDetailsGroup').style.display = 'none';
+
+            alert('✅ Return request submitted!');
+            loadEmployeeRequests();
+        }
+
+        function loadEmployeeRequests() {
+            const myRequests = requests.filter(r => r.employeeId === currentUser.id);
+            const list = document.getElementById('employeeRequestsList');
+            if (!list) return;
+
+            list.innerHTML = myRequests.length ? myRequests.map(r => `
+                <div class="request-item">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-name">${r.type === 'new' ? 'New Asset Request' : 'Return Request'}</div>
+                            <span class="status status-${r.status.toLowerCase()}">${r.status}</span>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <div><strong>Date:</strong> ${new Date(r.requestDate).toLocaleDateString()}</div>
+                        ${r.type === 'new' ? `
+                            <div><strong>Asset Type:</strong> ${r.assetType}</div>
+                            <div><strong>Priority:</strong> ${r.priority}</div>
+                            <div style="grid-column: 1 / -1;"><strong>Reason:</strong> ${r.reason}</div>
+                        ` : `
+                            <div><strong>Asset:</strong> ${r.assetName}</div>
+                            <div><strong>Damage:</strong> ${r.damageReport}</div>
+                        `}
+                        ${r.approvedBy ? `<div><strong>Processed By:</strong> ${r.approvedBy}</div>` : ''}
+                        ${r.rejectionReason ? `<div style="grid-column: 1 / -1; color: #fca5a5;"><strong>Rejection Reason:</strong> ${r.rejectionReason}</div>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="empty"><p>No requests yet</p></div>';
+        }
+
+        function showProfile() {
+            document.getElementById('profileModal').classList.add('show');
+            document.getElementById('profilePhoto').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('profileName').value = currentUser.name || '';
+            document.getElementById('profileEmail').value = currentUser.email || '';
+            document.getElementById('profilePhone').value = currentUser.phone || '';
+            document.getElementById('profileDept').value = currentUser.dept || '';
+            document.getElementById('profileRole').value = currentUser.role || '';
+        }
+
+        function closeProfile() {
+            document.getElementById('profileModal').classList.remove('show');
+        }
+
+        function updateProfile() {
+            const name = document.getElementById('profileName').value.trim();
+            const email = document.getElementById('profileEmail').value.trim();
+            const phone = document.getElementById('profilePhone').value.trim();
+            const dept = document.getElementById('profileDept').value.trim();
+
+            if (!name || !email) {
+                alert('Name और Email required हैं!');
+                return;
+            }
+
+            currentUser.name = name;
+            currentUser.email = email;
+            currentUser.phone = phone;
+            currentUser.dept = dept;
+
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            users[userIndex] = currentUser;
+
+            localStorage.setItem('users', JSON.stringify(users));
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            document.getElementById('userName').textContent = 'Welcome, ' + currentUser.name;
+            
+            alert('✅ Profile updated successfully!');
+            closeProfile();
+        }
+
         window.onload = init;
     </script>
+</body>
+</html>
