@@ -1,45 +1,127 @@
-Parse.Cloud.define("hello", (request) => {
-  return "Hello from Backend!";
-});
+// ============= USER FUNCTIONS =============
 
-// User Registration
 Parse.Cloud.define("registerUser", async (request) => {
   const { username, password, name, email, phone, dept, role } = request.params;
-
-  // Check if user exists
+  
   const query = new Parse.Query(Parse.User);
   query.equalTo("username", username);
   const existingUser = await query.first({ useMasterKey: true });
-
+  
   if (existingUser) {
-    throw new Parse.Error(400, "Username already exists");
+    throw new Error("Username already exists");
   }
-
-  // Create new user
+  
   const user = new Parse.User();
   user.set("username", username);
   user.set("password", password);
   user.set("name", name);
   user.set("email", email);
   user.set("phone", phone);
-  user.set("department", dept);
+  user.set("dept", dept);
   user.set("role", role);
+  
+  await user.signUp(null, { useMasterKey: true });
+  return { success: true, message: "User registered successfully" };
+});
 
+Parse.Cloud.define("loginUser", async (request) => {
+  const { username, password, role } = request.params;
+  
   try {
-    await user.signUp(null, { useMasterKey: true });
-    return { success: true, message: "User registered successfully" };
+    const user = await Parse.User.logIn(username, password);
+    
+    if (user.get("role") !== role) {
+      throw new Error("Role mismatch");
+    }
+    
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        username: user.get("username"),
+        name: user.get("name"),
+        email: user.get("email"),
+        phone: user.get("phone"),
+        dept: user.get("dept"),
+        role: user.get("role")
+      }
+    };
   } catch (error) {
-    throw new Parse.Error(500, error.message);
+    throw new Error("Invalid credentials or role mismatch");
   }
 });
 
-// Add Asset
-Parse.Cloud.define("addAsset", async (request) => {
+Parse.Cloud.define("getAllUsers", async (request) => {
+  const query = new Parse.Query(Parse.User);
+  const users = await query.find({ useMasterKey: true });
+  
+  return users.map(u => ({
+    id: u.id,
+    username: u.get("username"),
+    name: u.get("name"),
+    email: u.get("email"),
+    phone: u.get("phone"),
+    dept: u.get("dept"),
+    role: u.get("role")
+  }));
+});
+
+Parse.Cloud.define("updateUserProfile", async (request) => {
+  const { userId, name, email, phone, dept } = request.params;
+  
+  const query = new Parse.Query(Parse.User);
+  const user = await query.get(userId, { useMasterKey: true });
+  
+  user.set("name", name);
+  user.set("email", email);
+  user.set("phone", phone);
+  user.set("dept", dept);
+  
+  await user.save(null, { useMasterKey: true });
+  return { success: true, message: "Profile updated successfully" };
+});
+
+Parse.Cloud.define("deleteUser", async (request) => {
+  const { userId } = request.params;
+  
+  const query = new Parse.Query(Parse.User);
+  const user = await query.get(userId, { useMasterKey: true });
+  
+  await user.destroy({ useMasterKey: true });
+  return { success: true, message: "User deleted successfully" };
+});
+
+Parse.Cloud.define("resetPassword", async (request) => {
+  const { username, newPassword } = request.params;
+  
+  const query = new Parse.Query(Parse.User);
+  query.equalTo("username", username);
+  const user = await query.first({ useMasterKey: true });
+  
+  if (!user) {
+    throw new Error("User not found");
+  }
+  
+  user.set("password", newPassword);
+  await user.save(null, { useMasterKey: true });
+  return { success: true, message: "Password reset successfully" };
+});
+
+// ============= ASSET FUNCTIONS =============
+
+Parse.Cloud.define("createAsset", async (request) => {
   const { assetId, name, type, value, status, location, description, createdBy } = request.params;
-
-  const Asset = Parse.Object.extend("Asset");
-  const asset = new Asset();
-
+  
+  const Assets = Parse.Object.extend("Assets");
+  const query = new Parse.Query(Assets);
+  query.equalTo("assetId", assetId);
+  const existing = await query.first();
+  
+  if (existing) {
+    throw new Error("Asset ID already exists");
+  }
+  
+  const asset = new Assets();
   asset.set("assetId", assetId);
   asset.set("name", name);
   asset.set("type", type);
@@ -48,121 +130,277 @@ Parse.Cloud.define("addAsset", async (request) => {
   asset.set("location", location);
   asset.set("description", description);
   asset.set("createdBy", createdBy);
-
-  try {
-    await asset.save(null, { useMasterKey: true });
-    return { success: true, message: "Asset added successfully", assetId: asset.id };
-  } catch (error) {
-    throw new Parse.Error(500, error.message);
-  }
-});
-
-// Get All Assets
-Parse.Cloud.define("getAssets", async (request) => {
-  const query = new Parse.Query("Asset");
   
-  try {
-    const results = await query.find({ useMasterKey: true });
-    return results.map(asset => ({
-      id: asset.id,
-      assetId: asset.get("assetId"),
-      name: asset.get("name"),
-      type: asset.get("type"),
-      value: asset.get("value"),
-      status: asset.get("status"),
-      location: asset.get("location"),
-      description: asset.get("description"),
-      createdBy: asset.get("createdBy"),
-      createdAt: asset.get("createdAt")
-    }));
-  } catch (error) {
-    throw new Parse.Error(500, error.message);
-  }
+  await asset.save();
+  return { success: true, message: "Asset created successfully", id: asset.id };
 });
 
-// Assign Asset
+Parse.Cloud.define("getAllAssets", async (request) => {
+  const Assets = Parse.Object.extend("Assets");
+  const query = new Parse.Query(Assets);
+  const assets = await query.find();
+  
+  return assets.map(a => ({
+    id: a.id,
+    assetId: a.get("assetId"),
+    name: a.get("name"),
+    type: a.get("type"),
+    value: a.get("value"),
+    status: a.get("status"),
+    location: a.get("location"),
+    description: a.get("description"),
+    createdBy: a.get("createdBy"),
+    createdAt: a.createdAt
+  }));
+});
+
+Parse.Cloud.define("updateAssetStatus", async (request) => {
+  const { assetId, status } = request.params;
+  
+  const Assets = Parse.Object.extend("Assets");
+  const query = new Parse.Query(Assets);
+  const asset = await query.get(assetId);
+  
+  asset.set("status", status);
+  await asset.save();
+  return { success: true, message: "Asset status updated" };
+});
+
+Parse.Cloud.define("deleteAsset", async (request) => {
+  const { assetId } = request.params;
+  
+  const Assets = Parse.Object.extend("Assets");
+  const query = new Parse.Query(Assets);
+  const asset = await query.get(assetId);
+  
+  await asset.destroy();
+  return { success: true, message: "Asset deleted successfully" };
+});
+
+// ============= ASSIGNMENT FUNCTIONS =============
+
 Parse.Cloud.define("assignAsset", async (request) => {
-  const { assetId, employeeId, employeeName, assetName, assetAssetId, assignDate, notes } = request.params;
-
-  const Assignment = Parse.Object.extend("Assignment");
-  const assignment = new Assignment();
-
-  assignment.set("assetId", assetId);
-  assignment.set("employeeId", employeeId);
-  assignment.set("employeeName", employeeName);
-  assignment.set("assetName", assetName);
-  assignment.set("assetAssetId", assetAssetId);
+  const { assetId, employeeId, assignDate, notes } = request.params;
+  
+  const Assets = Parse.Object.extend("Assets");
+  const assetQuery = new Parse.Query(Assets);
+  const asset = await assetQuery.get(assetId);
+  
+  const userQuery = new Parse.Query(Parse.User);
+  const employee = await userQuery.get(employeeId, { useMasterKey: true });
+  
+  const Assignments = Parse.Object.extend("Assignments");
+  const assignment = new Assignments();
+  
+  assignment.set("assetId", asset);
+  assignment.set("assetName", asset.get("name"));
+  assignment.set("assetAssetId", asset.get("assetId"));
+  assignment.set("employeeId", employee);
+  assignment.set("employeeName", employee.get("name"));
   assignment.set("assignDate", new Date(assignDate));
   assignment.set("notes", notes);
-  assignment.set("returned", false);
-
-  try {
-    await assignment.save(null, { useMasterKey: true });
-
-    // Update asset status
-    const assetQuery = new Parse.Query("Asset");
-    const asset = await assetQuery.get(assetId, { useMasterKey: true });
-    asset.set("status", "In-Use");
-    await asset.save(null, { useMasterKey: true });
-
-    return { success: true, message: "Asset assigned successfully" };
-  } catch (error) {
-    throw new Parse.Error(500, error.message);
-  }
-});
-
-// Submit Request
-Parse.Cloud.define("submitRequest", async (request) => {
-  const { type, employeeId, employeeName, assetId, assetType, assetName, reason, priority, damageReport } = request.params;
-
-  const Request = Parse.Object.extend("Request");
-  const requestObj = new Request();
-
-  requestObj.set("type", type);
-  requestObj.set("employeeId", employeeId);
-  requestObj.set("employeeName", employeeName);
-  requestObj.set("assetId", assetId);
-  requestObj.set("assetType", assetType);
-  requestObj.set("assetName", assetName);
-  requestObj.set("reason", reason);
-  requestObj.set("priority", priority);
-  requestObj.set("damageReport", damageReport);
-  requestObj.set("status", "Pending");
-
-  try {
-    await requestObj.save(null, { useMasterKey: true });
-    return { success: true, message: "Request submitted successfully" };
-  } catch (error) {
-    throw new Parse.Error(500, error.message);
-  }
-});
-
-// Get Requests
-Parse.Cloud.define("getRequests", async (request) => {
-  const query = new Parse.Query("Request");
   
-  try {
-    const results = await query.find({ useMasterKey: true });
-    return results.map(req => ({
-      id: req.id,
-      type: req.get("type"),
-      employeeId: req.get("employeeId"),
-      employeeName: req.get("employeeName"),
-      assetType: req.get("assetType"),
-      status: req.get("status"),
-      requestDate: req.get("createdAt")
-    }));
-  } catch (error) {
-    throw new Parse.Error(500, error.message);
+  await assignment.save();
+  
+  asset.set("status", "In-Use");
+  await asset.save();
+  
+  return { success: true, message: "Asset assigned successfully" };
+});
+
+Parse.Cloud.define("returnAsset", async (request) => {
+  const { assignmentId, condition, returnNotes } = request.params;
+  
+  const Assignments = Parse.Object.extend("Assignments");
+  const query = new Parse.Query(Assignments);
+  query.include("assetId");
+  const assignment = await query.get(assignmentId);
+  
+  assignment.set("returnDate", new Date());
+  assignment.set("condition", condition);
+  assignment.set("returnNotes", returnNotes);
+  await assignment.save();
+  
+  const asset = assignment.get("assetId");
+  
+  if (condition === "Good") {
+    asset.set("status", "Available");
+  } else if (condition === "Fair") {
+    asset.set("status", "Maintenance");
+  } else {
+    asset.set("status", "Damaged");
   }
+  await asset.save();
+  
+  return { success: true, message: "Asset returned successfully" };
+});
+
+Parse.Cloud.define("getAllAssignments", async (request) => {
+  const Assignments = Parse.Object.extend("Assignments");
+  const query = new Parse.Query(Assignments);
+  query.include("assetId");
+  query.include("employeeId");
+  const assignments = await query.find();
+  
+  return assignments.map(a => ({
+    id: a.id,
+    assetName: a.get("assetName"),
+    assetAssetId: a.get("assetAssetId"),
+    employeeName: a.get("employeeName"),
+    assignDate: a.get("assignDate"),
+    returnDate: a.get("returnDate"),
+    condition: a.get("condition"),
+    notes: a.get("notes"),
+    returnNotes: a.get("returnNotes")
+  }));
+});
+
+Parse.Cloud.define("getEmployeeAssignments", async (request) => {
+  const { employeeId } = request.params;
+  
+  const userQuery = new Parse.Query(Parse.User);
+  const employee = await userQuery.get(employeeId, { useMasterKey: true });
+  
+  const Assignments = Parse.Object.extend("Assignments");
+  const query = new Parse.Query(Assignments);
+  query.equalTo("employeeId", employee);
+  const assignments = await query.find();
+  
+  return assignments.map(a => ({
+    id: a.id,
+    assetName: a.get("assetName"),
+    assetAssetId: a.get("assetAssetId"),
+    assignDate: a.get("assignDate"),
+    returnDate: a.get("returnDate"),
+    condition: a.get("condition"),
+    notes: a.get("notes")
+  }));
+});
+
+// ============= REQUEST FUNCTIONS =============
+
+Parse.Cloud.define("submitRequest", async (request) => {
+  const { type, employeeId, assetId, assetType, reason, priority, damageReport, damageDetails, returnReason, assignmentId } = request.params;
+  
+  const userQuery = new Parse.Query(Parse.User);
+  const employee = await userQuery.get(employeeId, { useMasterKey: true });
+  
+  const Requests = Parse.Object.extend("Requests");
+  const newRequest = new Requests();
+  
+  newRequest.set("type", type);
+  newRequest.set("employeeId", employee);
+  newRequest.set("employeeName", employee.get("name"));
+  newRequest.set("status", "Pending");
+  newRequest.set("requestDate", new Date());
+  
+  if (type === "new") {
+    const Assets = Parse.Object.extend("Assets");
+    const assetQuery = new Parse.Query(Assets);
+    const asset = await assetQuery.get(assetId);
+    
+    newRequest.set("assetId", asset);
+    newRequest.set("assetType", assetType);
+    newRequest.set("assetName", asset.get("name"));
+    newRequest.set("reason", reason);
+    newRequest.set("priority", priority);
+  } else if (type === "return") {
+    newRequest.set("assignmentId", assignmentId);
+    newRequest.set("returnReason", returnReason);
+    newRequest.set("damageReport", damageReport);
+    newRequest.set("damageDetails", damageDetails);
+  }
+  
+  await newRequest.save();
+  return { success: true, message: "Request submitted successfully" };
+});
+
+Parse.Cloud.define("approveRequest", async (request) => {
+  const { requestId, approvedBy } = request.params;
+  
+  const Requests = Parse.Object.extend("Requests");
+  const query = new Parse.Query(Requests);
+  const req = await query.get(requestId);
+  
+  req.set("status", "Approved");
+  req.set("approvedBy", approvedBy);
+  req.set("approvedDate", new Date());
+  await req.save();
+  
+  return { success: true, message: "Request approved successfully" };
+});
+
+Parse.Cloud.define("rejectRequest", async (request) => {
+  const { requestId, approvedBy, rejectionReason } = request.params;
+  
+  const Requests = Parse.Object.extend("Requests");
+  const query = new Parse.Query(Requests);
+  const req = await query.get(requestId);
+  
+  req.set("status", "Rejected");
+  req.set("approvedBy", approvedBy);
+  req.set("approvedDate", new Date());
+  req.set("rejectionReason", rejectionReason);
+  await req.save();
+  
+  return { success: true, message: "Request rejected" };
+});
+
+Parse.Cloud.define("getAllRequests", async (request) => {
+  const Requests = Parse.Object.extend("Requests");
+  const query = new Parse.Query(Requests);
+  query.include("employeeId");
+  query.include("assetId");
+  const requests = await query.find();
+  
+  return requests.map(r => ({
+    id: r.id,
+    type: r.get("type"),
+    employeeName: r.get("employeeName"),
+    assetType: r.get("assetType"),
+    assetName: r.get("assetName"),
+    reason: r.get("reason"),
+    priority: r.get("priority"),
+    status: r.get("status"),
+    requestDate: r.get("requestDate"),
+    approvedBy: r.get("approvedBy"),
+    rejectionReason: r.get("rejectionReason"),
+    damageReport: r.get("damageReport"),
+    damageDetails: r.get("damageDetails")
+  }));
+});
+
+Parse.Cloud.define("getEmployeeRequests", async (request) => {
+  const { employeeId } = request.params;
+  
+  const userQuery = new Parse.Query(Parse.User);
+  const employee = await userQuery.get(employeeId, { useMasterKey: true });
+  
+  const Requests = Parse.Object.extend("Requests");
+  const query = new Parse.Query(Requests);
+  query.equalTo("employeeId", employee);
+  const requests = await query.find();
+  
+  return requests.map(r => ({
+    id: r.id,
+    type: r.get("type"),
+    assetType: r.get("assetType"),
+    assetName: r.get("assetName"),
+    reason: r.get("reason"),
+    priority: r.get("priority"),
+    status: r.get("status"),
+    requestDate: r.get("requestDate"),
+    approvedBy: r.get("approvedBy"),
+    rejectionReason: r.get("rejectionReason")
+  }));
 });
 ```
 
 ---
 
-## 4. **.gitignore**
+## 6️⃣ `.gitignore`
 ```
 node_modules/
+npm-debug.log
 .env
-*.log
 .DS_Store
