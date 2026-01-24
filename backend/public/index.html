@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Management Backend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 3rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        h1 { font-size: 3rem; margin-bottom: 1rem; }
+        p { font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Asset Management Backend</h1>
+        <p>Backend is running successfully!</p>
+        <p>API Endpoint: <code>/parse</code></p>
+    </div>
+</body>
+</html>
+```
+
+---
+
+## **Back4App Par Deploy Kaise Karen:**
+
+### **Step 1: GitHub Repository Banao**
+1. GitHub par naya repo create karo
+2. Sabhi files upload karo
+
+### **Step 2: Back4App Setup**
+1. **Back4App** par jao: https://www.back4app.com/
+2. **Create New App** → App name do
+3. **Cloud Code** section mein jao
+4. **Deploy from GitHub** select karo
+5. Apna GitHub repo connect karo
+6. Branch select karo (main/master)
+7. **Deploy** button dabao
+
+### **Step 3: Environment Variables Set Karo**
+Back4App Dashboard → **Server Settings** → **Environment Variables**:
+```
+APP_ID = your_app_id_from_back4app
+MASTER_KEY = your_master_key_from_back4app
+SERVER_URL = https://your-app.b4a.io/parse
