@@ -1154,13 +1154,6 @@
                     <label>Asset Type *</label>
                     <select id="requestAssetType">
                         <option value="">Select Type</option>
-                        <option value="Furniture">Furniture</option>
-                        <option value="Electronic Instruments">Electronic Instruments</option>
-                        <option value="Hardware">Hardware</option>
-                        <option value="Software">Software</option>
-                        <option value="Paper">Paper</option>
-                        
-                        <option value="Other">Other</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1663,18 +1656,20 @@
         }
 
         function populateDropdowns() {
+            // Admin: Assign section - Show ALL available assets
             const availableAssets = assets.filter(a => a.status === 'Available');
-            const employees = users.filter(u => u.role === 'employee');
-            const activeAssignments = assignments.filter(a => !a.returnDate);
-
             document.getElementById('assignAssetId').innerHTML = '<option value="">Select Asset</option>' +
-                availableAssets.map(a => `<option value="${a.id}">${a.name} (${a.assetId})</option>`).join('');
+                availableAssets.map(a => `<option value="${a.id}">${a.name} (${a.assetId}) - ${a.type}</option>`).join('');
 
+            // Admin: Assign section - Show ALL registered employees
+            const employees = users.filter(u => u.role === 'employee');
             document.getElementById('assignEmployeeId').innerHTML = '<option value="">Select Employee</option>' +
-                employees.map(e => `<option value="${e.id}">${e.name} (${e.dept})</option>`).join('');
+                employees.map(e => `<option value="${e.id}">${e.name} - ${e.dept}</option>`).join('');
 
+            // Admin: Return section - Show ONLY assigned assets (not returned yet)
+            const activeAssignments = assignments.filter(a => !a.returnDate);
             document.getElementById('returnAssignmentId').innerHTML = '<option value="">Select Assignment</option>' +
-                activeAssignments.map(a => `<option value="${a.id}">${a.assetName} → ${a.employeeName}</option>`).join('');
+                activeAssignments.map(a => `<option value="${a.id}">${a.assetName} (${a.assetAssetId}) → ${a.employeeName}</option>`).join('');
 
             document.getElementById('historyAssetSelect').innerHTML = '<option value="">Select Asset</option>' +
                 assets.map(a => `<option value="${a.id}">${a.name} (${a.assetId})</option>`).join('');
@@ -1940,12 +1935,17 @@
         }
 
         function populateEmployeeDropdowns() {
+            // Employee: Return section - Show ONLY assets assigned to this employee (not returned yet)
             const myAssets = assignments.filter(a => 
                 a.employeeId === currentUser.id && !a.returnDate
             );
-
             document.getElementById('returnRequestAsset').innerHTML = '<option value="">Select Asset</option>' +
                 myAssets.map(a => `<option value="${a.id}">${a.assetName} (${a.assetAssetId})</option>`).join('');
+
+            // Employee: New Request - Show unique asset types from admin's added assets
+            const uniqueTypes = [...new Set(assets.map(a => a.type))];
+            document.getElementById('requestAssetType').innerHTML = '<option value="">Select Type</option>' +
+                uniqueTypes.map(type => `<option value="${type}">${type}</option>`).join('');
         }
 
         function submitRequest() {
@@ -2020,6 +2020,7 @@
 
             alert('✅ Return request submitted!');
             loadEmployeeRequests();
+            populateEmployeeDropdowns(); // Refresh dropdown to remove returned asset
         }
 
         function loadEmployeeRequests() {
