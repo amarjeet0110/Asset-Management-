@@ -1,65 +1,34 @@
 const express = require('express');
 const ParseServer = require('parse-server').ParseServer;
-const ParseDashboard = require('parse-dashboard');
-const path = require('path');
 
 const app = express();
 
-// Parse Server configuration
 const api = new ParseServer({
-  databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/asset-management',
+  databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/asset-db',
   cloud: './cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || 'myMasterKey',
   serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse',
-  clientKey: process.env.CLIENT_KEY || 'myClientKey',
-  javascriptKey: process.env.JAVASCRIPT_KEY || 'myJavaScriptKey',
-  restAPIKey: process.env.REST_API_KEY || 'myRestAPIKey',
-  fileKey: process.env.FILE_KEY || 'myFileKey',
+  javascriptKey: process.env.JAVASCRIPT_KEY || 'myJsKey',
 });
 
-// Parse Dashboard configuration (optional)
-const dashboard = new ParseDashboard({
-  apps: [
-    {
-      serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse',
-      appId: process.env.APP_ID || 'myAppId',
-      masterKey: process.env.MASTER_KEY || 'myMasterKey',
-      appName: 'Asset Management System',
-    },
-  ],
-  users: [
-    {
-      user: process.env.DASHBOARD_USER || 'admin',
-      pass: process.env.DASHBOARD_PASS || 'admin123',
-    },
-  ],
-  trustProxy: 1,
-}, { allowInsecureHTTP: true });
-
-// Serve Parse Server on /parse URL prefix
 app.use('/parse', api);
 
-// Serve Parse Dashboard on /dashboard URL prefix
-app.use('/dashboard', dashboard);
-
-// Health check endpoint
 app.get('/', (req, res) => {
-  res.json({
-    status: 'OK',
+  res.json({ 
+    status: 'OK', 
     message: 'Asset Management Backend is running',
     endpoints: {
       parse: '/parse',
-      dashboard: '/dashboard',
-    },
+      health: '/'
+    }
   });
 });
 
-// CORS middleware
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Parse-Application-Id, X-Parse-REST-API-Key, X-Parse-Master-Key');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
@@ -67,7 +36,18 @@ app.use((req, res, next) => {
 });
 
 const port = process.env.PORT || 1337;
-app.listen(port, () => {
-  console.log(`🚀 Parse Server running on port ${port}`);
-  console.log(`📊 Dashboard available at http://localhost:${port}/dashboard`);
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${port}`);
+  console.log(`📡 Parse Server: http://0.0.0.0:${port}/parse`);
 });
+```
+
+---
+
+### **Step 3: `cloud/main.js` Check Karo**
+
+Folder structure:
+```
+📁 cloud/
+  📄 main.js
