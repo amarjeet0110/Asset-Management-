@@ -1,32 +1,73 @@
 const express = require('express');
-const { ParseServer } = require('parse-server');
+const ParseServer = require('parse-server').ParseServer;
+const ParseDashboard = require('parse-dashboard');
 const path = require('path');
 
 const app = express();
 
-// Parse Server Configuration
+// Parse Server configuration
 const api = new ParseServer({
   databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/asset-management',
-  cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
-  appId: process.env.APP_ID || 'YOUR_APP_ID',
-  masterKey: process.env.MASTER_KEY || 'YOUR_MASTER_KEY',
+  cloud: './cloud/main.js',
+  appId: process.env.APP_ID || 'myAppId',
+  masterKey: process.env.MASTER_KEY || 'myMasterKey',
   serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse',
-  allowClientClassCreation: true,
-  enableAnonymousUsers: false
+  clientKey: process.env.CLIENT_KEY || 'myClientKey',
+  javascriptKey: process.env.JAVASCRIPT_KEY || 'myJavaScriptKey',
+  restAPIKey: process.env.REST_API_KEY || 'myRestAPIKey',
+  fileKey: process.env.FILE_KEY || 'myFileKey',
 });
 
-// Serve Parse API on /parse URL prefix
+// Parse Dashboard configuration (optional)
+const dashboard = new ParseDashboard({
+  apps: [
+    {
+      serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse',
+      appId: process.env.APP_ID || 'myAppId',
+      masterKey: process.env.MASTER_KEY || 'myMasterKey',
+      appName: 'Asset Management System',
+    },
+  ],
+  users: [
+    {
+      user: process.env.DASHBOARD_USER || 'admin',
+      pass: process.env.DASHBOARD_PASS || 'admin123',
+    },
+  ],
+  trustProxy: 1,
+}, { allowInsecureHTTP: true });
+
+// Serve Parse Server on /parse URL prefix
 app.use('/parse', api);
 
-// Serve static files
-app.use(express.static('public'));
+// Serve Parse Dashboard on /dashboard URL prefix
+app.use('/dashboard', dashboard);
 
-// Default route
+// Health check endpoint
 app.get('/', (req, res) => {
-  res.send('Asset Management Backend is running!');
+  res.json({
+    status: 'OK',
+    message: 'Asset Management Backend is running',
+    endpoints: {
+      parse: '/parse',
+      dashboard: '/dashboard',
+    },
+  });
+});
+
+// CORS middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Parse-Application-Id, X-Parse-REST-API-Key, X-Parse-Master-Key');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
 });
 
 const port = process.env.PORT || 1337;
 app.listen(port, () => {
-  console.log(`🚀 Backend running on port ${port}`);
+  console.log(`🚀 Parse Server running on port ${port}`);
+  console.log(`📊 Dashboard available at http://localhost:${port}/dashboard`);
 });
