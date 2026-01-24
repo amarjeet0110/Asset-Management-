@@ -1,0 +1,168 @@
+Parse.Cloud.define("hello", (request) => {
+  return "Hello from Backend!";
+});
+
+// User Registration
+Parse.Cloud.define("registerUser", async (request) => {
+  const { username, password, name, email, phone, dept, role } = request.params;
+
+  // Check if user exists
+  const query = new Parse.Query(Parse.User);
+  query.equalTo("username", username);
+  const existingUser = await query.first({ useMasterKey: true });
+
+  if (existingUser) {
+    throw new Parse.Error(400, "Username already exists");
+  }
+
+  // Create new user
+  const user = new Parse.User();
+  user.set("username", username);
+  user.set("password", password);
+  user.set("name", name);
+  user.set("email", email);
+  user.set("phone", phone);
+  user.set("department", dept);
+  user.set("role", role);
+
+  try {
+    await user.signUp(null, { useMasterKey: true });
+    return { success: true, message: "User registered successfully" };
+  } catch (error) {
+    throw new Parse.Error(500, error.message);
+  }
+});
+
+// Add Asset
+Parse.Cloud.define("addAsset", async (request) => {
+  const { assetId, name, type, value, status, location, description, createdBy } = request.params;
+
+  const Asset = Parse.Object.extend("Asset");
+  const asset = new Asset();
+
+  asset.set("assetId", assetId);
+  asset.set("name", name);
+  asset.set("type", type);
+  asset.set("value", parseFloat(value));
+  asset.set("status", status);
+  asset.set("location", location);
+  asset.set("description", description);
+  asset.set("createdBy", createdBy);
+
+  try {
+    await asset.save(null, { useMasterKey: true });
+    return { success: true, message: "Asset added successfully", assetId: asset.id };
+  } catch (error) {
+    throw new Parse.Error(500, error.message);
+  }
+});
+
+// Get All Assets
+Parse.Cloud.define("getAssets", async (request) => {
+  const query = new Parse.Query("Asset");
+  
+  try {
+    const results = await query.find({ useMasterKey: true });
+    return results.map(asset => ({
+      id: asset.id,
+      assetId: asset.get("assetId"),
+      name: asset.get("name"),
+      type: asset.get("type"),
+      value: asset.get("value"),
+      status: asset.get("status"),
+      location: asset.get("location"),
+      description: asset.get("description"),
+      createdBy: asset.get("createdBy"),
+      createdAt: asset.get("createdAt")
+    }));
+  } catch (error) {
+    throw new Parse.Error(500, error.message);
+  }
+});
+
+// Assign Asset
+Parse.Cloud.define("assignAsset", async (request) => {
+  const { assetId, employeeId, employeeName, assetName, assetAssetId, assignDate, notes } = request.params;
+
+  const Assignment = Parse.Object.extend("Assignment");
+  const assignment = new Assignment();
+
+  assignment.set("assetId", assetId);
+  assignment.set("employeeId", employeeId);
+  assignment.set("employeeName", employeeName);
+  assignment.set("assetName", assetName);
+  assignment.set("assetAssetId", assetAssetId);
+  assignment.set("assignDate", new Date(assignDate));
+  assignment.set("notes", notes);
+  assignment.set("returned", false);
+
+  try {
+    await assignment.save(null, { useMasterKey: true });
+
+    // Update asset status
+    const assetQuery = new Parse.Query("Asset");
+    const asset = await assetQuery.get(assetId, { useMasterKey: true });
+    asset.set("status", "In-Use");
+    await asset.save(null, { useMasterKey: true });
+
+    return { success: true, message: "Asset assigned successfully" };
+  } catch (error) {
+    throw new Parse.Error(500, error.message);
+  }
+});
+
+// Submit Request
+Parse.Cloud.define("submitRequest", async (request) => {
+  const { type, employeeId, employeeName, assetId, assetType, assetName, reason, priority, damageReport } = request.params;
+
+  const Request = Parse.Object.extend("Request");
+  const requestObj = new Request();
+
+  requestObj.set("type", type);
+  requestObj.set("employeeId", employeeId);
+  requestObj.set("employeeName", employeeName);
+  requestObj.set("assetId", assetId);
+  requestObj.set("assetType", assetType);
+  requestObj.set("assetName", assetName);
+  requestObj.set("reason", reason);
+  requestObj.set("priority", priority);
+  requestObj.set("damageReport", damageReport);
+  requestObj.set("status", "Pending");
+
+  try {
+    await requestObj.save(null, { useMasterKey: true });
+    return { success: true, message: "Request submitted successfully" };
+  } catch (error) {
+    throw new Parse.Error(500, error.message);
+  }
+});
+
+// Get Requests
+Parse.Cloud.define("getRequests", async (request) => {
+  const query = new Parse.Query("Request");
+  
+  try {
+    const results = await query.find({ useMasterKey: true });
+    return results.map(req => ({
+      id: req.id,
+      type: req.get("type"),
+      employeeId: req.get("employeeId"),
+      employeeName: req.get("employeeName"),
+      assetType: req.get("assetType"),
+      status: req.get("status"),
+      requestDate: req.get("createdAt")
+    }));
+  } catch (error) {
+    throw new Parse.Error(500, error.message);
+  }
+});
+```
+
+---
+
+## 4. **.gitignore**
+```
+node_modules/
+.env
+*.log
+.DS_Store
