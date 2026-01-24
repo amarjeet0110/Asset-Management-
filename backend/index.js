@@ -3,7 +3,6 @@ const ParseServer = require('parse-server').ParseServer;
 
 const app = express();
 
-// Parse Server Configuration
 const api = new ParseServer({
   databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/asset-db',
   cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
@@ -17,10 +16,8 @@ const api = new ParseServer({
   allowClientClassCreation: true,
 });
 
-// Serve Parse API on /parse
 app.use('/parse', api);
 
-// Health check endpoint
 app.get('/', (req, res) => {
   res.json({ 
     status: 'OK', 
@@ -28,7 +25,7 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       parse: '/parse',
-      health: '/'
+      health: '/health'
     }
   });
 });
@@ -37,7 +34,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
 
-// CORS middleware
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -48,13 +44,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Error handling
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
-
-// Start server
 const port = process.env.PORT || 1337;
 const host = '0.0.0.0';
 
@@ -66,13 +55,3 @@ app.listen(port, host, () => {
   console.log(`💚 Health check: http://${host}:${port}/health`);
   console.log('=================================');
 });
-```
-
----
-
-### **Step 2: `cloud/main.js` File Banao**
-
-**Folder structure:**
-```
-📁 cloud/
-  📄 main.js
